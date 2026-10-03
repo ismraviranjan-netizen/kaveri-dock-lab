@@ -53,3 +53,15 @@ For a live run: `pip install anthropic`, set `ANTHROPIC_API_KEY`, and run withou
 ## Reading order for the exam
 
 E1 is the cell. E2, E3, E4, E6 are arrangements of the cell where code owns the path (Law 2). E7 is the one arrangement where the model owns the path, bounded by a budget and an exit (Law 3). E5 and E8 are the two levels of decomposition above chaining (Law 4). Run `./run_all.sh` once, then cover the output and predict what each file prints before running it again. The companion explainer is `../D1_Explained_COMBINED_All_8_Parts.pdf`.
+
+## `live/`: the same eight exhibits as plain, step-numbered live code
+
+`d1/live/e1_live.py` to `e8_live.py` are the exhibits rewritten for reading: no shared module, no `DRY_RUN`, every step numbered and commented, the email, claim and brief inlined. They talk to the real API with `claude-sonnet-5-5` as the main model and `claude-haiku-4-5` for the small jobs. Compiled into one PDF at `../D1_Live_Code_All_8_Sonnet.pdf`.
+
+```bash
+pip install anthropic            # and ANTHROPIC_API_KEY in the environment, or a .env in the repo root
+cd d1/live
+python e1_live.py
+```
+
+All eight compile. E1 and E7 were checked against the dry-run stand-in. None has been run against the live API yet.
