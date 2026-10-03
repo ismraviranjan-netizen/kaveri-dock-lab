@@ -154,6 +154,10 @@ def _resp(blocks, stop, **extra):
                            usage=SimpleNamespace(input_tokens=0, output_tokens=0), **extra)
 
 
+def _field(block, name):
+    """Read a content-block field whether the block is an SDK object or a plain dict."""
+    return block.get(name) if isinstance(block, dict) else getattr(block, name, None)
+
 class _FakeMessages:
     def __init__(self): self.calls = 0
 
@@ -171,8 +175,8 @@ class _FakeMessages:
         for m in messages:
             c = m["content"]
             if m["role"] == "assistant" and not isinstance(c, str):
-                for b in c:
-                    if getattr(b, "type", "") == "tool_use": id_to_name[b.id] = b.name
+                for b in c:                           # blocks may be SDK objects or plain dicts; the API takes both
+                    if _field(b, "type") == "tool_use": id_to_name[_field(b, "id")] = _field(b, "name")
             if m["role"] == "user" and isinstance(c, list):
                 for b in c:
                     if isinstance(b, dict) and b.get("type") == "tool_result":
