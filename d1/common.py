@@ -8,6 +8,16 @@ import asyncio, itertools, json, os, re
 from pathlib import Path
 from types import SimpleNamespace
 
+# Optional .env next to this file (or in the repo root): KEY=value lines, loaded only if the variable is not already set.
+# The file is in .gitignore. Never commit the key.
+for _env in (Path(__file__).with_name(".env"), Path(__file__).resolve().parent.parent / ".env"):
+    if _env.exists():
+        for _line in _env.read_text().splitlines():
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _v = _line.split("=", 1)
+                os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
+
 DRY_RUN  = os.environ.get("DRY_RUN") == "1"
 SCENARIO = os.environ.get("D1_SCENARIO", "default")
 
