@@ -172,7 +172,7 @@ def ask_json(model, question, max_tokens=MAX_TOKENS):
     return json.loads(raw)
 
 
-async def ask_async(model, question, max_tokens=256):
+async def ask_async(model, question, max_tokens=MAX_TOKENS):
     """The async twin of ask(), for E4. On battery it sleeps 0.2 s so the slowest-scout lesson is visible."""
     if DRY_RUN:
         from standin import canned_text
