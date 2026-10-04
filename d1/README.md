@@ -1,37 +1,65 @@
 # d1/ — the Control Tower exhibits, runnable
 
-The eight code exhibits from `CCAR-P_D1_Control_Tower_Brief.pdf` (E1 to E8), written as standalone files so they run and print, the way the Domain 3 scripts at the repository root do. Padma's email, the refund claim and Meera's brief live in `data/`. The two kaveri tool schemas mirror `../e1_kaveri_mcp.py`.
+The eight code exhibits from `CCAR-P_D1_Control_Tower_Brief.pdf` (E1 to E8), written as plain, step-numbered Python files so they run, print, and can be read top to bottom. One set of files, used both for the dry run and for live calls. The same files are printed, with a flowchart each, in `../D1_Live_Code_With_Flowcharts.pdf`.
 
 ## Run
 
 ```bash
-pip install fastmcp            # not needed here; only for the D3 scripts
+pip install anthropic                 # once, for live runs
+
+# live: ANTHROPIC_API_KEY in a .env file in the repo root (git-ignored; see ../.env.example)
 cd d1
-DRY_RUN=1 python e1_augmented_llm.py      # any single exhibit
-./run_all.sh                              # all eight, then E7 under three stop_reason scenarios
+python e1_augmented_llm.py
+
+# on battery: zero paid calls, no key needed
+DRY_RUN=1 python e1_augmented_llm.py          # Linux / Mac
+set DRY_RUN=1                                 # Windows Command Prompt, then: python e1_augmented_llm.py
+./run_all.sh     or     run_all.bat           # all eight, then E7 under three stop_reason scenarios
 ```
 
-`DRY_RUN=1` makes `make_client()` return a scripted stand-in for the Messages API. The exhibits run their real control flow (the same `stop_reason` branches, the same replayed transcript), but every reply is canned and nothing leaves the machine. Zero paid calls, no key, no SDK needed.
+`DRY_RUN=1` makes `make_client()` return the scripted stand-in in `standin.py`. The exhibits run their real control flow (the same `stop_reason` branches, the same replayed transcript), but every reply is canned and nothing leaves the machine.
 
-For a live run: `pip install anthropic`, set `ANTHROPIC_API_KEY`, and run without `DRY_RUN`. The live path is written against the current SDK but has **not** been executed in this repository, because no key was available.
+## Models
+
+| Constant | Model | Used for |
+|---|---|---|
+| `MODEL_MAIN` | `claude-sonnet-5-5` | judgement, planning, drafting, synthesis, E7's loop |
+| `MODEL_SMALL` | `claude-haiku-4-5` | one-word sorts, small workers, short apologies |
+
+Production would put refunds and planning on the Opus tier. Sonnet keeps a learning run cheap: the whole series once through costs well under half a dollar. Both constants live in `common.py`.
 
 ## The files
 
-| File | Pattern | Objective | Law | What it prints |
+| File | What it is | Pattern | Objective | Law |
 |---|---|---|---|---|
-| `common.py` | the shared desk | | | nothing; `ask`, `ask_json`, `ask_async`, `trace`, the canned world, the stand-in client |
-| `e1_augmented_llm.py` | augmented LLM | 1.3a | | two turns: `tool_use` then `end_turn`, and the JSON triage |
-| `e2_chaining.py` | prompt chaining | 1.3b | 2 | classify, gate, draft, then the gate rejecting a mumbled category |
-| `e3_routing.py` | routing | 1.3b | 1, 2 | the ward the nurse picked and its model, the specialist's reply, the default ward |
-| `e4_parallel.py` | parallelization | 1.3b | | three scouts' wall clock versus sequential; three judges' majority |
-| `e5_orchestrator_workers.py` | orchestrator-workers | 1.5 | 4 | the model-written plan, each worker's finding with its declared needs, one recommendation |
-| `e6_evaluator_optimizer.py` | evaluator-optimizer | 1.3b | 3 | draft word count, editor's criticism, revision, PASS |
-| `e7_agent_loop.py` | the agent loop | 1.3c | 3 | one `stop_reason` per turn, the final text or an escalation with a reason |
-| `e8_replanning.py` | re-planning | 1.5 | 3, 4 | run lines, the replan that drops task 3 and adds two, the growth budget, the recommendation |
+| `common.py` | the shared desk: switches, `.env` loader, models, inputs from `data/`, the two tool schemas, the two tool functions, `text_of`, `trace`, `make_client`, `ask`, `ask_json`, `ask_async` | | | |
+| `standin.py` | the dry-run stand-in. Not needed to learn the patterns | | | |
+| `e1_augmented_llm.py` | one call, one tool, at most one round-trip | augmented LLM | 1.3a | |
+| `e2_chaining.py` | classify, gate, draft, in a fixed order | prompt chaining | 1.3b | 2 |
+| `e3_routing.py` | a cheap nurse picks the ward, the ward picks the model | routing | 1.3b | 1, 2 |
+| `e4_parallel.py` | three scouts at once; three judges vote | parallelization | 1.3b | |
+| `e5_orchestrator_workers.py` | the model writes the plan, code runs the workers, synthesis closes | orchestrator-workers | 1.5 | 4 |
+| `e6_evaluator_optimizer.py` | writer and editor, `MAX_ROUNDS` and `PASS` | evaluator-optimizer | 1.3b | 3 |
+| `e7_agent_loop.py` | a bounded loop steered by `stop_reason`, every value explicit | agent loop | 1.3c | 3 |
+| `e8_replanning.py` | E5 plus a check after every finding, capped by `MAX_NEW` | re-planning | 1.5 | 3, 4 |
+| `data/` | Padma's email, the refund claim, Meera's brief | | | |
+
+## What each file prints on battery
+
+```
+e1  # turn 1 stop_reason=tool_use (get_shipment_status) / # turn 2 stop_reason=end_turn / {"category": "customs", "urgency": "high"}
+e2  Desk 1 said: 'customs' / Gate passed / Desk 2 wrote 93 words / Sabotage: Gate stopped the line: bad category: customs-ish
+e3  Nurse said: 'customs' -> ward: customs -> model: claude-sonnet-5-5 / Customs ward reply / 'address' -> 'delay' on claude-haiku-4-5
+e4  three scout lines / Parallel 0.2 s vs Sequential 0.6 s / Votes ['APPROVE', 'REJECT', 'APPROVE'] -> Majority APPROVE
+e5  Foreman's plan (ids 1-3) / Worker 1..3 with needs / RECOMMENDATION: file the e-way bill today ...
+e6  Draft 0: 142 words / Round 1 editor said: <criticism> / Round 1 revised: 93 words / Round 2 editor said: PASS
+e7  tool_use (get_shipment_status) / tool_use (find_alternate_carriers) / end_turn / recommendation text
+e8  Initial plan / Run 1 ... / REPLAN: dropped [3] added ['file e-way bill', 'notify Padma of revised ETA'] / Run 2, Run 4, Run 5 / grew=2, budget MAX_NEW=3 not exhausted / RECOMMENDATION
+```
 
 ## E7 scenarios
 
-`D1_SCENARIO` steers the stand-in's final reply so each branch of E7's `match` can be watched:
+`D1_SCENARIO` steers the stand-in's final reply so each branch of E7 can be watched:
 
 | Value | What the stand-in does | Branch exercised |
 |---|---|---|
@@ -40,28 +68,23 @@ For a live run: `pip install anthropic`, set `ANTHROPIC_API_KEY`, and run withou
 | `refuse` | the final reply is a `refusal` with `stop_details` | a different path, no blind retry |
 | `exhaust` | asks for the phone on every turn | the floor: budget exhausted, human hand-off with a reason |
 
+## Live versus battery: what to expect
+
+- The `stop_reason` trace should match the battery run line for line. The wording will not.
+- E2 and E3 have no tool, so a live nurse will most likely say `delay`, not `customs`. The customs fact only exists where a tool supplies it (E1, E7) or the code hands it over as facts (E5, E8).
+- E1 live may wrap its JSON in a code fence or add prose. E1 does not parse the answer, so nothing breaks. E5 and E8 do parse, which is why `ask_json` strips the fence.
+- E7's `truncate`, `refuse` and `exhaust` scenarios exist only on battery.
+
 ## Where this departs from the book, and why
 
-- **DRY_RUN is a stand-in, not an early return.** The book's exhibits return a canned verdict and stop before any call. Here the dry run swaps the client instead, so you can watch `stop_reason` steer the loop with zero paid calls. Both make no paid calls. This is the same trick the Domain 3 lab used in `e5_hybrid.py`, where DRY_RUN swapped the paid embedder for the toy foreman.
-- **Model IDs** were checked against the current API reference. The book's September-2026 alias `claude-sonnet-5` is replaced by the current tiers in `common.py`: `claude-opus-5-5` for judgement and money, `claude-sonnet-5-5` for explanation, `claude-haiku-4-5` for one-word sorts. Change them in one place.
-- **No server-side fallbacks.** Production code on these models would normally add the `fallbacks` parameter so a refusal is retried on another model. It is left out on purpose so E7's `refusal` branch is exercised as the book intends: the loop escalates to a human with a reason.
-- **`text_of()` instead of `content[0].text`.** Current models may place thinking blocks before the text, so the exhibits read the text blocks by type. Assistant turns are replayed whole, blocks unchanged.
-- **E8's new subtasks are proper task records** with fresh ids and empty `needs`, and additions are clipped at the cap. The book's sketch appended bare strings.
-- **`max_tokens` is 1024** rather than the book's 500 to 1000, because thinking tokens count toward it on current models.
-- **E4 sleeps 0.2 s per scout on battery** so the slowest-scout lesson shows as a number, not a sentence.
+- **DRY_RUN is a stand-in, not an early return.** The book's exhibits return a canned verdict before any call. Here the dry run swaps the client, so the real control flow runs with zero paid calls. Same trick as the toy foreman in the Domain 3 `e5_hybrid.py`.
+- **Model IDs** are current: `claude-sonnet-5-5` and `claude-haiku-4-5`, in one place in `common.py`.
+- **No server-side fallbacks**, on purpose, so E7's `refusal` branch does what the book teaches: escalate to a human with a reason.
+- **`text_of()` instead of `content[0].text`**, because current models may put a thinking block first. Assistant turns are replayed whole.
+- **E8's new subtasks are proper task records** with fresh ids and empty `needs`, clipped at the cap. The book's sketch appended bare strings.
+- **E5 and E8 hand the workers depot facts** (`FACTS`), so a live worker reasons over facts the code supplied instead of inventing them.
+- **`max_tokens` is 1024**, because thinking tokens count toward it on current models.
 
 ## Reading order for the exam
 
-E1 is the cell. E2, E3, E4, E6 are arrangements of the cell where code owns the path (Law 2). E7 is the one arrangement where the model owns the path, bounded by a budget and an exit (Law 3). E5 and E8 are the two levels of decomposition above chaining (Law 4). Run `./run_all.sh` once, then cover the output and predict what each file prints before running it again. The companion explainer is `../D1_Explained_COMBINED_All_8_Parts.pdf`.
-
-## `live/`: the same eight exhibits as plain, step-numbered live code
-
-`d1/live/e1_live.py` to `e8_live.py` are the exhibits rewritten for reading: no shared module, no `DRY_RUN`, every step numbered and commented, the email, claim and brief inlined. They talk to the real API with `claude-sonnet-5-5` as the main model and `claude-haiku-4-5` for the small jobs. Compiled into one PDF at `../D1_Live_Code_All_8_Sonnet.pdf`.
-
-```bash
-pip install anthropic            # and ANTHROPIC_API_KEY in the environment, or a .env in the repo root
-cd d1/live
-python e1_live.py
-```
-
-All eight compile. E1 and E7 were checked against the dry-run stand-in. None has been run against the live API yet.
+E1 is the cell. E2, E3, E4, E6 are arrangements of the cell where code owns the path (Law 2). E7 is the one arrangement where the model owns the path, bounded by a budget and an exit (Law 3). E5 and E8 are the two levels of decomposition above chaining (Law 4). Run everything on battery once, then cover the output and predict what each file prints before running it again. Companions: `../D1_Explained_COMBINED_All_8_Parts.pdf`, `../D1_Live_Code_With_Flowcharts.pdf`, `../D1_Practice_Workbook.pdf`.

@@ -1,33 +1,88 @@
-# E8 · Re-planning — the bridge is out: a finding can change the plan (objective 1.5, dynamic decomposition complete)
-# E5's plan, plus a walk-and-look after every finding, plus a second budget: max_new caps how much the plan may grow.
+# E8 · Re-planning: the bridge is out, a finding can change the plan  (objective 1.5, dynamic decomposition)
+#
+#   Same three moves as E5 (make_plan -> run_worker -> synthesise), plus after EVERY finding the foreman is asked:
+#   "does the remaining plan still make sense?" If not, drop some tasks and add others.
+#   A second budget, MAX_NEW, caps how many tasks the plan may grow by. Law 3 applies to plans, not just turns.
+#
+# Run on battery:  DRY_RUN=1 python e8_replanning.py       Run live:  python e8_replanning.py
+
 import json
 from common import ask_json, MODEL_MAIN, BRIEF, DRY_RUN
-from e5_orchestrator_workers import plan_from, run_worker, synthesise     # E5's moves, reused
+from e5_orchestrator_workers import make_plan, run_worker, synthesise     # E5's three moves, reused
 
-def replan(brief, max_new=3):                           # cap on growth, too
-    tasks = plan_from(brief)                            # E5's opening move
-    findings, grew = {}, 0
-    next_id = max(t["id"] for t in tasks) + 1
-    while tasks:
-        sub = tasks.pop(0)
-        result = run_worker(sub, findings)              # E5's worker call
-        findings[sub["id"]] = result
-        print(f"# run {sub['id']}: {sub['task']:<18} -> {result}")
-        verdict = ask_json(MODEL_MAIN,                  # the walk-and-look: finding + remaining, not the history
-                           "Given this new finding, does the remaining plan still hold? "
-                           'Reply {"ok": true} or {"ok": false, "add": ["new subtasks"], "drop": [ids]}\n'
-                           + json.dumps({"finding": result, "remaining": tasks}))
-        if not verdict.get("ok", True) and grew < max_new:
-            drop = set(verdict.get("drop", []))
-            tasks = [t for t in tasks if t["id"] not in drop]
-            added = verdict.get("add", [])[:max_new - grew]   # never past the cap
-            for name in added:                          # the detour appears
-                tasks.append({"id": next_id, "task": name, "needs": []}); next_id += 1
-            grew += len(added)
-            print(f"# replan: ok=false  drop={sorted(drop)}  add={added}")
-    print(f"# grew={grew}, budget max_new={max_new} {'EXHAUSTED' if grew >= max_new else 'not exhausted'}")
-    return synthesise(brief, findings)                  # E5's closing move
+
+# ---------------------------------------------------------------
+# STEP 0. The growth budget
+# ---------------------------------------------------------------
+
+MAX_NEW = 3                               # at most 3 tasks may ever be added to the plan
+
+
+# ---------------------------------------------------------------
+# STEP 1. The new move: after a finding, ask whether the remaining plan still holds.
+#         The foreman sees the new finding and the REMAINING tasks, not the whole history.
+# ---------------------------------------------------------------
+
+def check_plan(finding, remaining_tasks):
+    question = (
+        "A worker just reported this finding:\n" + finding + "\n\n"
+        "These subtasks are still to be done:\n" + json.dumps(remaining_tasks) + "\n\n"
+        "Does the remaining plan still make sense given the finding? Reply with JSON only:\n"
+        '  {"ok": true}\n'
+        "or\n"
+        '  {"ok": false, "drop": [ids of tasks that no longer make sense], "add": ["short name of a new task", ...]}'
+    )
+    return ask_json(MODEL_MAIN, question)
+
+
+# ---------------------------------------------------------------
+# STEP 2. The loop with re-planning
+# ---------------------------------------------------------------
+
+def replan(brief):
+    tasks = make_plan(brief)                              # E5's opening move
+    print("Initial plan:", json.dumps(tasks))
+
+    findings = {}
+    grew = 0                                              # how many tasks have been added so far
+    next_id = max(task["id"] for task in tasks) + 1       # fresh ids for added tasks
+
+    while tasks:                                          # keep going until the task list is empty
+        current = tasks.pop(0)                            # take the first remaining task
+        result = run_worker(current, findings)            # E5's worker call
+        findings[current["id"]] = result
+        print("Run", current["id"], "(" + current["task"] + ") ->", result)
+
+        verdict = check_plan(result, tasks)               # the walk-and-look
+
+        if verdict.get("ok", True):
+            continue                                      # plan still holds, move on
+
+        if grew >= MAX_NEW:
+            print("  Replan requested, but the growth budget is spent. Keeping the plan as it is.")
+            continue
+
+        # Drop the tasks the foreman says no longer make sense.
+        drop_ids = set(verdict.get("drop", []))
+        tasks = [task for task in tasks if task["id"] not in drop_ids]
+
+        # Add the new ones as proper task records, but never past the cap.
+        room_left = MAX_NEW - grew
+        new_names = verdict.get("add", [])[:room_left]
+        for name in new_names:
+            tasks.append({"id": next_id, "task": name, "needs": []})
+            next_id = next_id + 1
+        grew = grew + len(new_names)
+        print("  REPLAN: dropped", sorted(drop_ids), "added", new_names)
+
+    if grew >= MAX_NEW:
+        print("grew=" + str(grew) + ", budget MAX_NEW=" + str(MAX_NEW) + " EXHAUSTED")
+    else:
+        print("grew=" + str(grew) + ", budget MAX_NEW=" + str(MAX_NEW) + " not exhausted")
+
+    return synthesise(brief, findings)                    # E5's closing move
+
 
 if __name__ == "__main__":
-    print(f"# E8 · re-planning · {'DRY_RUN' if DRY_RUN else 'LIVE'}")
+    print("# E8 · re-planning · " + ("DRY_RUN" if DRY_RUN else "LIVE"))
     print(replan(BRIEF))
