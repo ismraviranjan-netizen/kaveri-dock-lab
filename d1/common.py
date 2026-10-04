@@ -65,11 +65,17 @@ def trace(turn, r):
     names = [b.name for b in r.content if getattr(b, "type", "") == "tool_use"]
     print(f"# turn {turn}  stop_reason={r.stop_reason}" + (f"  ({', '.join(names)})" if names else ""))
 
+def _sdk_kwargs():
+    """An org-level key must name a workspace on every request. Set ANTHROPIC_WORKSPACE_ID (wrkspc_...) in .env,
+    or use a key created inside a workspace, in which case this header is not needed."""
+    ws = os.environ.get("ANTHROPIC_WORKSPACE_ID")
+    return {"default_headers": {"anthropic-workspace-id": ws}} if ws else {}
+
 def make_client():
     if DRY_RUN:
         return FakeClient()
     import anthropic                                  # only imported on the paid path
-    return anthropic.Anthropic()
+    return anthropic.Anthropic(**_sdk_kwargs())
 
 def ask(model, prompt, max_tokens=MAX_TOKENS):
     """One augmented-LLM call, text in, text out. Checks stop_reason before trusting the text."""
@@ -91,7 +97,7 @@ async def ask_async(model, prompt, max_tokens=256):
         await asyncio.sleep(0.2)
         return _canned_text(prompt)
     import anthropic
-    r = await anthropic.AsyncAnthropic().messages.create(model=model, max_tokens=max_tokens,
+    r = await anthropic.AsyncAnthropic(**_sdk_kwargs()).messages.create(model=model, max_tokens=max_tokens,
                                                          messages=[{"role": "user", "content": prompt}])
     return text_of(r).strip()
 
