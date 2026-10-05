@@ -83,7 +83,7 @@ e8  Initial plan / Run 1 ... / REPLAN: dropped [3] added ['file e-way bill', 'no
 - **`text_of()` instead of `content[0].text`**, because current models may put a thinking block first. Assistant turns are replayed whole.
 - **E8's new subtasks are proper task records** with fresh ids and empty `needs`, clipped at the cap. The book's sketch appended bare strings.
 - **E5 and E8 hand the workers depot facts** (`FACTS`), so a live worker reasons over facts the code supplied instead of inventing them.
-- **`max_tokens` is 1024**, because thinking tokens count toward it on current models.
+- **`max_tokens` is 2048**, because thinking tokens count toward it on current models. A reply that hits the cap raises a clear error instead of returning empty text.
 
 ## Reading order for the exam
 

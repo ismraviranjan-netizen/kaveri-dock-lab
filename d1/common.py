@@ -45,7 +45,7 @@ SCENARIO = os.environ.get("D1_SCENARIO", "default")      # steers the stand-in's
 
 MODEL_MAIN = "claude-sonnet-5-5"    # judgement, planning, drafting, synthesis
 MODEL_SMALL = "claude-haiku-4-5"    # one-word sorts, small workers, short apologies
-MAX_TOKENS = 1024                   # the longest reply we accept; thinking tokens count toward it
+MAX_TOKENS = 2048                   # the longest reply we accept; thinking tokens count toward it
 # Production would put refunds and planning on the Opus tier (claude-opus-5-5).
 # Sonnet is used here so a learning run stays cheap. Change the one constant above to switch.
 
@@ -157,6 +157,10 @@ def ask(model, question, system=None, max_tokens=MAX_TOKENS):
 
     if reply.stop_reason == "refusal":
         raise RuntimeError("The model declined to answer.")
+    if reply.stop_reason == "max_tokens":
+        # The reply was cut off. On current models the thinking block comes first and counts toward
+        # max_tokens, so a cut-off reply can hold NO text at all. Fail loudly rather than return "".
+        raise RuntimeError("Reply cut off at max_tokens=" + str(max_tokens) + " before it finished. Raise MAX_TOKENS.")
     return text_of(reply).strip()
 
 
@@ -188,4 +192,6 @@ async def ask_async(model, question, max_tokens=MAX_TOKENS):
     )
     if reply.stop_reason == "refusal":
         raise RuntimeError("The model declined to answer.")
+    if reply.stop_reason == "max_tokens":
+        raise RuntimeError("Reply cut off at max_tokens=" + str(max_tokens) + " before it finished. Raise MAX_TOKENS.")
     return text_of(reply).strip()
