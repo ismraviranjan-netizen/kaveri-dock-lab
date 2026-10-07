@@ -1,2 +1,4 @@
 __pycache__/
 *.pyc
+d4_weighbridge/demo_*.json
+d4_weighbridge/demo_*.jsonl
