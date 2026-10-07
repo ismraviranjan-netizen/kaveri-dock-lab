@@ -1,0 +1,9 @@
+{"id": "fs-01", "input": "Hi, my parcel KF-7711 is late by two days, what is happening?", "output": {"decision": "reply"}}
+{"id": "fs-02", "input": "Need invoice copy for KF-6630 please.", "output": {"decision": "reply"}}
+{"id": "fs-03", "input": "KF-5520 e-way bill wrong vehicle number, truck is at the gate.", "output": {"decision": "vehicle_update"}}
+{"id": "fs-04", "input": "Refund Rs 2,100 for the broken lamp on KF-3390.", "output": {"decision": "refund"}}
+{"id": "fs-05", "input": "KF-8802 order cancelled before pickup, please withdraw the bill.", "output": {"decision": "cancel"}}
+{"id": "fs-06", "input": "Someone from Kaveri called asking for my OTP — is that you?", "output": {"decision": "escalate"}}
+{"id": "fs-07", "input": "KF-4412: when does the Talegaon hold clear? Ship is tiles.", "output": {"decision": "reply"}}
+{"id": "fs-08", "input": "Can you reroute KF-9015 to Bhiwandi instead of Chakan?", "output": {"decision": "reroute"}}
+{"id": "fs-09", "input": "Please refund Rs 3,600 for the dented inverter on KF-2207.", "output": {"decision": "refund"}}

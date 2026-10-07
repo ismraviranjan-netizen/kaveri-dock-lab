@@ -1,0 +1,268 @@
+{
+ "release": {
+  "prompt": "v1.9",
+  "model": "claude-sonnet-5-5",
+  "index": "sop-2026-09-27"
+ },
+ "traces": [
+  {
+   "case": "G-031",
+   "index": "sop-2026-09-27",
+   "chunks": [
+    {
+     "id": "sop-214-c06",
+     "index": "sop-2026-09-27",
+     "score": 0.86
+    },
+    {
+     "id": "sop-214-c06",
+     "index": "sop-2026-09-27",
+     "score": 0.79
+    },
+    {
+     "id": "sop-214-c05",
+     "index": "sop-2026-09-27",
+     "score": 0.83
+    }
+   ]
+  },
+  {
+   "case": "G-058",
+   "index": "sop-2026-09-27",
+   "chunks": [
+    {
+     "id": "sop-214-c04",
+     "index": "sop-2026-09-27",
+     "score": 0.74
+    },
+    {
+     "id": "sop-214-c08",
+     "index": "sop-2026-09-27",
+     "score": 0.91
+    },
+    {
+     "id": "sop-214-c07",
+     "index": "sop-2026-09-27",
+     "score": 0.75
+    }
+   ]
+  },
+  {
+   "case": "G-077",
+   "index": "sop-2026-09-27",
+   "chunks": [
+    {
+     "id": "sop-214-c08",
+     "index": "sop-2026-09-27",
+     "score": 0.72
+    },
+    {
+     "id": "sop-214-c09",
+     "index": "sop-2026-09-27",
+     "score": 0.86
+    },
+    {
+     "id": "sop-214-c10",
+     "index": "sop-2026-09-27",
+     "score": 0.72
+    }
+   ]
+  },
+  {
+   "case": "G-102",
+   "index": "sop-2026-09-27",
+   "chunks": [
+    {
+     "id": "sop-214-c10",
+     "index": "sop-2026-09-27",
+     "score": 0.77
+    },
+    {
+     "id": "sop-214-c04",
+     "index": "sop-2026-09-27",
+     "score": 0.85
+    },
+    {
+     "id": "sop-214-c08",
+     "index": "sop-2026-09-27",
+     "score": 0.87
+    }
+   ]
+  },
+  {
+   "case": "G-140",
+   "index": "sop-2026-09-27",
+   "chunks": [
+    {
+     "id": "sop-214-c06",
+     "index": "sop-2026-09-27",
+     "score": 0.73
+    },
+    {
+     "id": "sop-214-c03",
+     "index": "sop-2026-09-27",
+     "score": 0.93
+    },
+    {
+     "id": "sop-214-c07",
+     "index": "sop-2026-09-27",
+     "score": 0.73
+    }
+   ]
+  },
+  {
+   "case": "G-163",
+   "index": "sop-2026-09-27",
+   "chunks": [
+    {
+     "id": "sop-214-c08",
+     "index": "sop-2026-09-27",
+     "score": 0.87
+    },
+    {
+     "id": "sop-214-c10",
+     "index": "sop-2026-09-27",
+     "score": 0.81
+    },
+    {
+     "id": "sop-214-c12",
+     "index": "sop-2026-09-27",
+     "score": 0.8
+    }
+   ]
+  },
+  {
+   "case": "G-188",
+   "index": "sop-2026-09-27",
+   "chunks": [
+    {
+     "id": "sop-214-c04",
+     "index": "sop-2026-09-27",
+     "score": 0.82
+    },
+    {
+     "id": "sop-214-c06",
+     "index": "sop-2026-09-27",
+     "score": 0.9
+    },
+    {
+     "id": "sop-214-c12",
+     "index": "sop-2026-09-27",
+     "score": 0.89
+    }
+   ]
+  }
+ ],
+ "receipts": [
+  {
+   "case": "G-031",
+   "model": "claude-sonnet-5-5",
+   "stop_reason": "end_turn",
+   "usage": {
+    "input_tokens": 1954,
+    "cache_read_input_tokens": 9200,
+    "output_tokens": 111
+   }
+  },
+  {
+   "case": "G-058",
+   "model": "claude-sonnet-5-5",
+   "stop_reason": "end_turn",
+   "usage": {
+    "input_tokens": 2092,
+    "cache_read_input_tokens": 9200,
+    "output_tokens": 140
+   }
+  },
+  {
+   "case": "G-077",
+   "model": "claude-sonnet-5-5",
+   "stop_reason": "end_turn",
+   "usage": {
+    "input_tokens": 1839,
+    "cache_read_input_tokens": 9200,
+    "output_tokens": 109
+   }
+  },
+  {
+   "case": "G-102",
+   "model": "claude-sonnet-5-5",
+   "stop_reason": "end_turn",
+   "usage": {
+    "input_tokens": 1759,
+    "cache_read_input_tokens": 9200,
+    "output_tokens": 127
+   }
+  },
+  {
+   "case": "G-140",
+   "model": "claude-sonnet-5-5",
+   "stop_reason": "end_turn",
+   "usage": {
+    "input_tokens": 1746,
+    "cache_read_input_tokens": 9200,
+    "output_tokens": 118
+   }
+  },
+  {
+   "case": "G-163",
+   "model": "claude-sonnet-5-5",
+   "stop_reason": "end_turn",
+   "usage": {
+    "input_tokens": 1973,
+    "cache_read_input_tokens": 9200,
+    "output_tokens": 124
+   }
+  },
+  {
+   "case": "G-188",
+   "model": "claude-sonnet-5-5",
+   "stop_reason": "end_turn",
+   "usage": {
+    "input_tokens": 1893,
+    "cache_read_input_tokens": 9200,
+    "output_tokens": 146
+   }
+  }
+ ],
+ "replies": [
+  "Per SOP 214 §4, your consignment G-031 will be released today by 6 pm. (SOP 214 §4)",
+  "Per SOP 214 §3, your consignment G-058 will be released today by 6 pm. (SOP 214 §3)",
+  "Per SOP 214 §6, your consignment G-077 will be released today by 6 pm. (SOP 214 §6)",
+  "Per SOP 214 §7, your consignment G-102 will be released today by 6 pm. (SOP 214 §7)",
+  "Per SOP 214 §4, your consignment G-140 will be released today by 6 pm. (SOP 214 §4)",
+  "Per SOP 214 §6, your consignment G-163 will be released today by 6 pm. (SOP 214 §6)",
+  "Per SOP 214 §3, your consignment G-188 will be released today by 6 pm. (SOP 214 §3)"
+ ],
+ "sop_clauses": [
+  "SOP 214 §1",
+  "SOP 214 §2",
+  "SOP 214 §3",
+  "SOP 214 §4",
+  "SOP 214 §5",
+  "SOP 214 §6",
+  "SOP 214 §7",
+  "SOP 214 §8",
+  "SOP 214 §9"
+ ],
+ "replays": {
+  "v1.8": {
+   "G-031": true,
+   "G-058": true,
+   "G-077": true,
+   "G-102": true,
+   "G-140": true,
+   "G-163": true,
+   "G-188": true
+  },
+  "v1.9": {
+   "G-031": false,
+   "G-058": false,
+   "G-077": false,
+   "G-102": false,
+   "G-140": false,
+   "G-163": false,
+   "G-188": false
+  }
+ }
+}
