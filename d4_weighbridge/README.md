@@ -42,6 +42,7 @@ recorded data, exactly as in the book. On Windows, if `₹` fails to print, run
 | `memory_map.md` | — | the 25 tiles |
 | `ledger.md` | — | the miss ledger (one row per miss) and the lab ledger (one row per surprise) |
 | `D4_Exhibits_Explained_Line_by_Line.pdf` | — | the eight exhibits with a plain-language comment at every step, exam lines in gold, decoded output and a flowchart per exhibit — read this before running a file |
+| `D4_Exhibits_Explained_Kindle.epub` | — | Kindle edition of the explained exhibits: every code line as its own card with a plain comment, 53 diagrams (pies, bars, strips, pipelines, grids, flowcharts) under the hard lines; send to your Kindle or open in any EPUB reader |
 | `CCAR-P_D4_The_Weighbridge.pdf` | — | the source book |
 
 ## How to practise an exhibit (the same drill for all eight)
