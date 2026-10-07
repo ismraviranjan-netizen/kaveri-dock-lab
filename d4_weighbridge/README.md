@@ -41,6 +41,7 @@ recorded data, exactly as in the book. On Windows, if `₹` fails to print, run
 | `atlas.md` | — | Atlas A1–A7 as text, with a redraw checklist for Day B |
 | `memory_map.md` | — | the 25 tiles |
 | `ledger.md` | — | the miss ledger (one row per miss) and the lab ledger (one row per surprise) |
+| `D4_Exhibits_Explained_Line_by_Line.pdf` | — | the eight exhibits with a plain-language comment at every step, exam lines in gold, decoded output and a flowchart per exhibit — read this before running a file |
 | `CCAR-P_D4_The_Weighbridge.pdf` | — | the source book |
 
 ## How to practise an exhibit (the same drill for all eight)
