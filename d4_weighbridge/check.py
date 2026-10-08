@@ -3,13 +3,16 @@
 #   python check.py e5         run one exhibit
 #   python check.py --record   overwrite expected/*.txt with today's output (only after a git restore!)
 # Use it as the sabotage lab's scale: change ONE line, predict, run check.py, read the diff, restore.
-import difflib, glob, os, subprocess, sys
+import difflib, os, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ENV = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
 
+EXHIBITS = ["e1_scorecard", "e2_golden_set", "e3_graders", "e4_calibrate",     # the eight book exhibits, nothing else
+            "e5_duel", "e6_interrogate", "e7_levers", "e8_watchman"]            # (variants like e3_graders_haiku.py are skipped)
+
 def exhibits():
-    return sorted(glob.glob(os.path.join(HERE, "e[1-8]_*.py")))
+    return [os.path.join(HERE, name + ".py") for name in EXHIBITS]
 
 def run(path):
     r = subprocess.run([sys.executable, os.path.basename(path)], cwd=HERE, env=ENV,
