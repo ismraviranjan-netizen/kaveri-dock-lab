@@ -27,6 +27,7 @@ recorded data, exactly as in the book. On Windows, if `₹` fails to print, run
 | `e1_scorecard.py` | 4.1 | six bars, each with operator and owner, scored on the 200-case set · reads `runs_v1_8.json` |
 | `e2_golden_set.py` | 4.2 | slice counts, escalate balance, leakage check over few-shot and corpus · reads `golden_v3.jsonl`, `fewshot_v1_9_*.jsonl`, `sop_corpus_chunks.jsonl` |
 | `e3_graders.py` | 4.2 | code grader, rubric-in-code with partial credit, LLM judge with UNKNOWN · self-contained |
+| `e3_graders_haiku.py` | 4.2 | E3 with the judge wired to a real Claude Haiku call (`claude-haiku-5-5`); grader lines unchanged · needs `pip install anthropic` and `ANTHROPIC_API_KEY`; `--show` prints the judge's reasoning |
 | `e4_calibrate.py` | 4.2 | judge calibration: overall ≥ 90 %, per category ≥ 85 % with n ≥ 10 · reads `calib_sat_40.json`, `calib_fri_52.json` |
 | `e5_duel.py` | 4.3 | the offline duel's verdict, the Thursday hole, pass@k vs pass^k · self-contained |
 | `e6_interrogate.py` | 4.4 | four suspects, cheapest convicting test first · reads `friday_fixtures.json` |
