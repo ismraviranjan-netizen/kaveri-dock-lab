@@ -1,0 +1,6 @@
+easy -> Haiku: True   hard -> Haiku: False
+₹ per exception 5.80 -> 4.10   (ceiling 6.00)
+claude-sonnet-5-5          prefix  9200  cacheable True
+claude-haiku-4-5-20251001  prefix  9200  cacheable True
+claude-haiku-4-5-20251001  prefix   900  cacheable False
+input billed per call   none 11000   miss 13300   hit 2720
