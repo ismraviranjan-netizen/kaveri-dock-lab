@@ -1,0 +1,5 @@
+all columns home : REJECT - lost 3.5 on refund_exact
+judge column only: SHIP to canary
+p=0.90 k=1: pass@k 0.900   pass^k 0.900
+p=0.90 k=3: pass@k 0.999   pass^k 0.729
+p=0.90 k=5: pass@k 1.000   pass^k 0.590

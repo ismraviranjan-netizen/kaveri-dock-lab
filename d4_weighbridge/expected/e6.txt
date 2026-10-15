@@ -1,0 +1,4 @@
+retrieval     CLEARED  21/21 chunks from sop-2026-09-27
+model         CLEARED  served by ['claude-sonnet-5-5']
+hallucination CLEARED  4/4 cited clauses exist
+prompt        GUILTY   v1.8 7/7 pass · v1.9 0/7 pass

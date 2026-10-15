@@ -1,0 +1,12 @@
+Saturday: overall 92% on 38 decided (+2 UNKNOWN -> human)  PASS
+   confident_wrong   4/5     80%   UNDER-SAMPLED
+   hedged_correct    8/9     89%   UNDER-SAMPLED
+   hedged_wrong      6/7     86%   UNDER-SAMPLED
+   needs_facts       3/3    100%   UNDER-SAMPLED
+   plain_correct    14/14   100%   ok
+Friday  : overall 86% on 50 decided (+2 UNKNOWN -> human)  FAIL
+   confident_wrong  12/17    71%   FAIL
+   hedged_correct    8/9     89%   UNDER-SAMPLED
+   hedged_wrong      6/7     86%   UNDER-SAMPLED
+   needs_facts       3/3    100%   UNDER-SAMPLED
+   plain_correct    14/14   100%   ok

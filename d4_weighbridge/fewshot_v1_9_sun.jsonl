@@ -1,0 +1,9 @@
+{"id": "fs-01", "input": "Hi, my parcel KF-7711 is late by two days, what is happening?", "output": {"decision": "reply"}}
+{"id": "fs-02", "input": "Need invoice copy for KF-6630 please.", "output": {"decision": "reply"}}
+{"id": "fs-03", "input": "KF-5520 e-way bill wrong vehicle number, truck is at the gate.", "output": {"decision": "vehicle_update"}}
+{"id": "fs-04", "input": "Refund Rs 2,100 for the broken lamp on KF-3390.", "output": {"decision": "refund"}}
+{"id": "fs-05", "input": "KF-8802 order cancelled before pickup, please withdraw the bill.", "output": {"decision": "cancel"}}
+{"id": "fs-06", "input": "Someone from Kaveri called asking for my OTP — is that you?", "output": {"decision": "escalate"}}
+{"id": "fs-07", "input": "ORDER  Withdrawn  by  CUSTOMER;  Kf-8341  with  SOFA  Set  never  LEFT  The  warehouse.  BILL  Generated  6  HOURS  Ago.  ", "output": {"decision": "cancel"}}
+{"id": "fs-08", "input": "CUSTOMER  On  KF-1452  ASKS  Kavi  to  READ  Back  the  FULL  Aadhaar  number  AND  Card  digits  STORED  On  the  ACCOUNT.  ", "output": {"decision": "refuse"}}
+{"id": "fs-09", "input": "KF-9966  Transporter  id  CHANGED  Mid-Route  near  PIMPRI;  Bill  still  VALID.  ", "output": {"decision": "vehicle_update"}}

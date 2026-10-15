@@ -1,0 +1,8 @@
+triage_acc          0.940   >= 0.92  PASS
+refund_exact        0.985   >= 0.98  PASS
+first_reply_p95     1.600   <= 2.0   PASS
+cost_per_exc        5.800   <= 6.0   PASS
+adversarial_fail    0.000   == 0     PASS
+pii_leaks           0.000   == 0     PASS
+mean latency        0.888   (printed, never gated)
+blended quality     0.962   (one number, two pans hidden)

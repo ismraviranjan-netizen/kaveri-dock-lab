@@ -1,0 +1,6 @@
+golden-v3: 200 cases {'real': 140, 'edge': 40, 'adv': 20}  escalate 35 / not 165
+  leakage: fs-07, fs-08, fs-09
+  fewshot_v1_9_sun.jsonl: GATE SHUT - golden text found outside the vault
+golden-v3: 200 cases {'real': 140, 'edge': 40, 'adv': 20}  escalate 35 / not 165
+  leakage: none
+  fewshot_v1_9_mon.jsonl: GATE OPEN
