@@ -47,6 +47,7 @@ One model, one constant, in `common.py`. Every `ask*()` call goes through `creat
 | `e8_two_bills.py` | nine full schemas versus nine one-line stubs, measured; then the three bills: monolithic, progressive, small+cached | 3.8 | 5 |
 | `e9_one_ticket.py` | the eight hops on one request, with the gate, the connector, the shelves, the priced window, the carrier timeout and a real draft call, all on one trace id | all | all |
 | `e10_two_lanes.py` | the Part 4 drawing as code: INGEST lane (chunk on headings, ★ situate with one model call, build the vector and BM25 indexes) and QUERY lane (search both, fuse, rerank with one model call, generate from a cached preamble + top-N); the shelves are built plain and situated so you can watch where section 4 ranks for a customer's question | 3.5, 3.6 | 2, 3 |
+| `e11_rerank_funnel.py` | the Part 5 funnel: the shelf is grown to ~100 chunks (SOP 214 + twelve decoy SOPs, two of them e-way bill lookalikes, written once by the model into `data/sop_decoys.md`); per question: search both, fuse to 100 candidates, ONE rerank call reads every candidate, top-20 go to generate; prints where SOP 214 §4 sits after every stage and the context bill of top-5/10/20 | 3.6 | 3 |
 | `gen_logday.py` | writes `data/logday.jsonl` for E7 | | |
 | `data/` | `sop_214.md`, `tools_all9.json` (copies of the root files), `logday.jsonl` (generated, git-ignored) | | |
 
@@ -71,6 +72,7 @@ e9  nine register lines on one trace id: route, authz, tool, resource, retrieve,
 - E4 live: the model should list Steps 1 and 2 from the fixed box and say MISSING for 3 to 6. If it fills in the rest from memory, that is exactly the failure to notice: the excerpt did not contain them.
 - E5 live: the foreman is one call that scores the ten section titles 0 to 10, then the fusion is the same code. Expect section 4 at rank 1 for both queries once both halves run.
 - E10 live: five calls in all (situate, then rerank and generate for each of two questions). The 'where section 4 ranks' lines are the lesson: for the customer's wording ('parcel stuck, paperwork problem') the plain shelves rank section 4 low on both indexes, and the situated shelves should lift it, because the model-written sentence in front of the chunk uses the customer's words. The `cache_read` figure on the second question's generate line should be non-zero: the preamble came back from the cache. No battery line is recorded for E10 yet.
+- E11 live: the first run writes `data/sop_decoys.md` with one model call (delete the file to regenerate); after that, two calls per question. Watch the 'where SOP 214 §4 sits' column: BM25 and the vector shelf rank the lookalike SOP 231/232 chunks high because they share §4's words; the reranker, reading text against the question, is the stage that separates e-way bill GENERATION from RE-FILING. The decoy text is model-written, so its exact wording varies between laptops. No battery line is recorded for E11 yet.
 - E7 and E9 live: the draft line carries the real `usage` numbers and a paise figure from the price list in `common.py`. The price list is approximate; edit it.
 - The toy foreman and the canned log day exist only on battery.
 
