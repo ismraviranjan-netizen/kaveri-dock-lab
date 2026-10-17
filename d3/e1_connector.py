@@ -12,7 +12,7 @@
 
 import asyncio
 from pathlib import Path
-from common import make_client, trace, text_of, tool_result, MODEL_MAIN, MAX_TOKENS, SOP_PATH, DRY_RUN
+from common import make_client, trace, text_of, tool_result, MODEL, MAX_TOKENS, SOP_PATH, DRY_RUN
 
 try:
     from fastmcp import FastMCP, Client
@@ -108,7 +108,7 @@ async def work_ticket(consignment_id):
         # 3d. A short bounded loop: tool_use -> dispatch through MCP -> send the result back.
         for turn in range(1, 5):
             reply = model_client.messages.create(
-                model=MODEL_MAIN, max_tokens=MAX_TOKENS, system=system, tools=tools, messages=conversation,
+                model=MODEL, max_tokens=MAX_TOKENS, system=system, tools=tools, messages=conversation,
             )
             trace(turn, reply)
 
@@ -130,7 +130,7 @@ async def work_ticket(consignment_id):
 
 
 if __name__ == "__main__":                       # the guard: importing this file never starts the server
-    print("# E1 · standard connector · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL_MAIN))
+    print("# E1 · standard connector · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL))
     print("=== Probe: the three primitives, in-process ===")
     asyncio.run(probe())
     print()

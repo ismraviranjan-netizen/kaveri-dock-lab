@@ -40,23 +40,22 @@ DRY_RUN = os.environ.get("DRY_RUN") == "1"              # battery mode: stand-in
 # STEP B. Models, reply length, and a rough price list
 # ---------------------------------------------------------------
 
-MODEL_MAIN = "claude-sonnet-5-5"    # drafting, scoring chunks, the one-ticket answer
-MODEL_SMALL = "claude-haiku-4-5"    # the router's one-word jobs, token counting
+MODEL = "claude-fable-5-1"          # one model for everything: drafting, scoring chunks, token counting
 MAX_TOKENS = 2048                   # the longest reply we accept; thinking tokens count toward it
-# Production would put refunds on the Opus tier (claude-opus-5-5). Sonnet keeps a learning run cheap.
+# Fable 5.1 is the latest and most capable model. Thinking is always on, so part of every reply budget
+# goes to thinking. It needs an account on 30-day data retention; a zero-retention org gets a 400.
 
 # Rough list prices in USD per million tokens, used ONLY by the cameras (E7, E9) to print paise.
 # Check the current price page before quoting these anywhere that matters.
 PRICE_USD_PER_MTOK = {
-    MODEL_MAIN:  {"in": 3.00, "out": 15.00},
-    MODEL_SMALL: {"in": 1.00, "out": 5.00},
+    MODEL: {"in": 10.00, "out": 50.00},
 }
 INR_PER_USD = 84.0
 
 
 def paise(model, input_tokens, output_tokens):
     """What one call cost, in paise, from its usage block and the price list above."""
-    price = PRICE_USD_PER_MTOK.get(model, PRICE_USD_PER_MTOK[MODEL_MAIN])
+    price = PRICE_USD_PER_MTOK.get(model, PRICE_USD_PER_MTOK[MODEL])
     usd = input_tokens / 1e6 * price["in"] + output_tokens / 1e6 * price["out"]
     return round(usd * INR_PER_USD * 100)
 
@@ -206,7 +205,7 @@ def ask_json(model, question, system=None, max_tokens=MAX_TOKENS):
     return json.loads(raw)
 
 
-def count_tokens(tools=None, text="hi", system=None, model=MODEL_SMALL):
+def count_tokens(tools=None, text="hi", system=None, model=MODEL):
     """How many input tokens a request would cost. Live: the API's own count_tokens endpoint, which is free.
     On battery: the four-characters-per-token bench, close enough to show the shape of a bill."""
     arguments = {"model": model, "messages": [{"role": "user", "content": text}]}

@@ -17,7 +17,7 @@ import json
 import re
 import time
 import uuid
-from common import ask_usage, count_tokens, paise, belt, ALL9, SOP, MODEL_MAIN, DRY_RUN
+from common import ask_usage, count_tokens, paise, belt, ALL9, SOP, MODEL, DRY_RUN
 from e1_connector import mcp, Client                      # E1 · the connector (tools, resource, prompt)
 from e3_gate_pass import authorize, audit_log             # E3 · the gate
 from e4_chunking import by_heading                        # E4 · the shelves
@@ -32,7 +32,7 @@ QUESTION = "Where is KF-2481 right now, and what do I do to get it out of custom
 USER, CALLER = "sunita.k", "kavi-agent"                   # the person and the service account travel together
 CHUNKS = by_heading(SOP)
 BELT = {"get_shipment_status", "find_alternate_carriers", "generate_eway_bill", "escalate_to_human"}
-DIALS = {"model": MODEL_MAIN, "k": 3, "rerank": True, "carrier_timeout_ms": 3000}
+DIALS = {"model": MODEL, "k": 3, "rerank": True, "carrier_timeout_ms": 3000}
 REGISTER = []                                             # the camera's tape for this one ticket
 
 
@@ -120,7 +120,7 @@ def p95(xs):
 
 
 if __name__ == "__main__":
-    print("# E9 · one ticket · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL_MAIN))
+    print("# E9 · one ticket · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL))
     print("# ticket " + TRACE + " · " + USER + " via " + CALLER)
     print("# q: " + QUESTION)
     print()

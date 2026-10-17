@@ -8,7 +8,7 @@
 # Run on battery:  DRY_RUN=1 python e6_shape_router.py      Run live:  python e6_shape_router.py
 
 import re
-from common import ask, MODEL_MAIN, SOP, DRY_RUN
+from common import ask, MODEL, SOP, DRY_RUN
 from e4_chunking import by_heading
 from e5_hybrid import hybrid
 
@@ -43,7 +43,7 @@ def hybrid_rag(question):
             section = chunk
     prompt = ("Draft the dispatcher's answer in under 80 words, using only this SOP section. "
               "Never promise a release time.\n\nQuestion: " + question + "\n\n" + section)
-    return "from " + top + ": " + ask(MODEL_MAIN, prompt)
+    return "from " + top + ": " + ask(MODEL, prompt)
 
 
 # ---------------------------------------------------------------
@@ -64,7 +64,7 @@ def route(question):
 
 
 if __name__ == "__main__":
-    print("# E6 · retrieval router · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL_MAIN))
+    print("# E6 · retrieval router · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL))
 
     # STEP 3. Four questions, four routes. Only the last two cost a model call.
     for q in ("Where is KF-2481 right now?",

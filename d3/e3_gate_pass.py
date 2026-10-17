@@ -9,7 +9,7 @@
 
 import json
 from common import (make_client, trace, text_of, tool_result, belt, fake_status, fake_refund, fake_escalate,
-                    MODEL_MAIN, MAX_TOKENS, DRY_RUN)
+                    MODEL, MAX_TOKENS, DRY_RUN)
 
 
 # ---------------------------------------------------------------
@@ -91,7 +91,7 @@ def serve(caller, request):
 
     for turn in range(1, 6):                                  # bounded, always
         reply = client.messages.create(
-            model=MODEL_MAIN, max_tokens=MAX_TOKENS, system=SYSTEM, tools=TOOLS, messages=conversation,
+            model=MODEL, max_tokens=MAX_TOKENS, system=SYSTEM, tools=TOOLS, messages=conversation,
         )
         trace(turn, reply)
 
@@ -116,7 +116,7 @@ def serve(caller, request):
 
 
 if __name__ == "__main__":
-    print("# E3 · gate pass · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL_MAIN))
+    print("# E3 · gate pass · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL))
 
     print("=== Three callers at the refund door, before the fix ===")
     for caller in ("kavi-agent", "refund-desk", "carrier-portal-v1"):

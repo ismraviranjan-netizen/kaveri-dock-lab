@@ -11,7 +11,7 @@
 import math
 import re
 from collections import Counter
-from common import ask_json, MODEL_MAIN, SOP, DRY_RUN
+from common import ask_json, MODEL, SOP, DRY_RUN
 from e4_chunking import by_heading
 
 CHUNKS = by_heading(SOP)
@@ -93,7 +93,7 @@ def semantic(query, chunks):
         "Reply with JSON only: a list of numbers in the same order as the sections.\n\n"
         "Query: " + query + "\n\nSections:\n" + "\n".join(str(i) + ". " + t for i, t in enumerate(titles, 1))
     )
-    scores = ask_json(MODEL_MAIN, question)
+    scores = ask_json(MODEL, question)
     return [float(s) / 10.0 for s in scores]
 
 
@@ -115,7 +115,7 @@ def hybrid(query, chunks, w_sem=W_SEM, k=TOP_K):
 
 
 if __name__ == "__main__":
-    print("# E5 · hybrid · " + ("DRY_RUN (toy foreman)" if DRY_RUN else "LIVE foreman · " + MODEL_MAIN)
+    print("# E5 · hybrid · " + ("DRY_RUN (toy foreman)" if DRY_RUN else "LIVE foreman · " + MODEL)
           + " · w_sem=" + str(W_SEM))
 
     # STEP 4. Two queries: one exact phrase, one symptom in the customer's words.

@@ -9,7 +9,7 @@
 # Run on battery:  DRY_RUN=1 python e4_chunking.py          Run live:  python e4_chunking.py
 
 import re
-from common import ask, MODEL_MAIN, SOP, DRY_RUN
+from common import ask, MODEL, SOP, DRY_RUN
 
 
 # ---------------------------------------------------------------
@@ -83,11 +83,11 @@ def answer_from(chunk):
         "one line each. If any step is not in the excerpt, write MISSING for it. Do not use outside knowledge.\n\n"
         "EXCERPT:\n" + chunk
     )
-    return ask(MODEL_MAIN, question)
+    return ask(MODEL, question)
 
 
 if __name__ == "__main__":
-    print("# E4 · chunking · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL_MAIN))
+    print("# E4 · chunking · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL))
 
     # STEP 4. Cut the SOP three ways and count.
     F = fixed(SOP)

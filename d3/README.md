@@ -24,10 +24,9 @@ $env:DRY_RUN = "1"                            # Windows PowerShell
 
 | Constant | Model | Used for |
 |---|---|---|
-| `MODEL_MAIN` | `claude-sonnet-5-5` | drafting, the E1 and E3 tool loops, E5's live foreman |
-| `MODEL_SMALL` | `claude-haiku-4-5` | `count_tokens` (free endpoint, the model only picks the tokenizer) |
+| `MODEL` | `claude-fable-5-1` | everything: drafting, the E1 and E3 tool loops, E5's live foreman, `count_tokens` (free endpoint, the model only picks the tokenizer) |
 
-A whole live run of the nine files is about a dozen Sonnet calls plus free `count_tokens` calls: well under half a dollar. Both constants live in `common.py`.
+One model, one constant, in `common.py`. Fable 5.1 is the latest and most capable model: $10 per million input tokens and $50 per million output tokens, thinking always on (it counts toward `max_tokens`), and it needs an account on 30-day data retention. A whole live run of the nine files is about a dozen calls plus free `count_tokens` calls: a few dollars at most.
 
 ## The files
 
@@ -56,7 +55,7 @@ e3  kavi-agent DENY, refund-desk ALLOW, carrier-portal-v1 ALLOW (the wildcard) /
 e4  fixed 8 chunks False / heading 10 chunks True / box 4 holds Step 1 and 2 only / fixed box answer: MISSING Step 3-6 / heading chunk answer: all six present
 e5  q1 register-only puts section 4 first, foreman-only puts section 3 first (Padma's incident), hybrid puts section 4 first / q2 all three put section 1 first
 e6  structured_lookup -> the TMS row / sql_aggregate -> 41 / "How many times has KF-2481" -> sql_aggregate (rule order) / hybrid_rag -> drafted from section 4
-e7  four JSON lines, one trace id, draft tokens=473 cost_pc=22 / retrieve mean= 395ms p95= 2,349ms <- the mean lied
+e7  four JSON lines, one trace id, draft tokens=473 cost_pc=(from the price list in common.py) / retrieve mean= 395ms p95= 2,349ms <- the mean lied
 e8  schemas 725 vs stubs 423 / monolithic 361,445 / progressive 4,403 + 1 round-trip / small+cached 4,302 / gap 82x
 e9  nine register lines on one trace id: route, authz, tool, resource, retrieve, assemble, carrier_eta, draft, total / the answer cites section 4, promised_date=false
 ```
@@ -76,7 +75,7 @@ e9  nine register lines on one trace id: route, authz, tool, resource, retrieve,
 - **Every exhibit touches the API where the lesson needs it.** E1 dispatches the model's tool calls through MCP; E3 hands the gate's denial back as a `tool_result` error; E4 lets the model read from one chunk; E5 uses the model as the semantic half; E6 drafts on the RAG road; E7 and E9 log a real `usage` block. The kit's E2 and E8 arithmetic is unchanged.
 - **E6's rule order** puts aggregate language before the id pattern, so "How many times has KF-2481 been delayed?" counts instead of returning one row (the kit's sabotage lesson, Dock Book II Q35).
 - **E3 gives kavi-agent an escalation scope**, so the denied refund has a legal next move. The audit line is written for denials too.
-- **Model IDs** are current: `claude-sonnet-5-5` and `claude-haiku-4-5`, in one place in `common.py`.
+- **The model ID** is current: `claude-fable-5-1`, in one place in `common.py`.
 - **`max_tokens` is 2048** and a reply that hits the cap raises a clear error instead of returning empty text.
 
 ## Reading order for the exam

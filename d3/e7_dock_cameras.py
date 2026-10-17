@@ -12,7 +12,7 @@ import re
 import time
 import uuid
 from collections import defaultdict
-from common import ask_usage, paise, MODEL_MAIN, SOP, LOGDAY, DRY_RUN
+from common import ask_usage, paise, MODEL, SOP, LOGDAY, DRY_RUN
 from e4_chunking import by_heading
 from e5_hybrid import bm25ish, title_of
 
@@ -48,8 +48,8 @@ def fetch_chunks(question, k=1):
 def draft_reply(question, chunks):
     prompt = ("Draft the dispatcher's answer in under 80 words, using only this SOP section. "
               "Never promise a release time.\n\nQuestion: " + question + "\n\n" + chunks[0])
-    text, tokens_in, tokens_out = ask_usage(MODEL_MAIN, prompt)
-    return text, tokens_in + tokens_out, paise(MODEL_MAIN, tokens_in, tokens_out)
+    text, tokens_in, tokens_out = ask_usage(MODEL, prompt)
+    return text, tokens_in + tokens_out, paise(MODEL, tokens_in, tokens_out)
 
 
 # ---------------------------------------------------------------
@@ -68,7 +68,7 @@ def one_ticket(question):
     log(trace=trace, stage="retrieve", ms=ms_since(s), tokens=tok, cost_pc=pc, top1=title_of(chunks[0]))
 
     s = time.perf_counter(); answer, tok, pc = draft_reply(question, chunks)
-    log(trace=trace, stage="draft", ms=ms_since(s), tokens=tok, cost_pc=pc, model=MODEL_MAIN)
+    log(trace=trace, stage="draft", ms=ms_since(s), tokens=tok, cost_pc=pc, model=MODEL)
 
     log(trace=trace, stage="total", ms=ms_since(t0))
     return answer
@@ -97,7 +97,7 @@ def digest(path=LOGDAY):
 
 
 if __name__ == "__main__":
-    print("# E7 · dock cameras · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL_MAIN))
+    print("# E7 · dock cameras · " + ("DRY_RUN" if DRY_RUN else "LIVE · " + MODEL))
 
     print("=== One ticket through the cameras ===")
     print(one_ticket("How do I re-file an e-way bill after a hold?"))
