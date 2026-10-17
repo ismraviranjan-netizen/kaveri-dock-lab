@@ -34,6 +34,7 @@ One model, one constant, in `common.py`. Fable 5.1 is the latest and most capabl
 
 | File | What it is | Objective | Law |
 |---|---|---|---|
+| `ask_about.py` | not an exhibit: a helper. Run any exhibit into a file, then `python ask_about.py e7_out.txt` and ask questions about that output in a conversation | | |
 | `common.py` | the shared desk: the switch, `.env` loader, models, a rough price list, SOP 214 and the nine-tool belt from `data/`, the tool functions, `text_of`, `trace`, `tool_result`, `make_client`, `ask`, `ask_json`, `ask_usage`, `count_tokens` | | |
 | `standin.py` | the dry-run stand-in. Not needed to learn the patterns | | |
 | `e1_connector.py` | a FastMCP server with two tools, a resource, a prompt; the in-process probe; then the model works a ticket with the resource in context, the prompt as the user turn, and tools dispatched through the MCP client | 3.7 | 1 |
