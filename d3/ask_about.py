@@ -11,8 +11,17 @@ SYSTEM = ("You are helping a student read the output of a small Python program t
           "Be concrete: quote the line you are reading from.")
 
 
+def read_text(path):
+    """Read the file whatever Windows wrote it as. PowerShell 5's > saves UTF-16 (it starts with the bytes
+    FF FE); PowerShell 7, cmd and Linux save UTF-8. Look at the first bytes and decode accordingly."""
+    raw = open(path, "rb").read()
+    if raw.startswith(b"\xff\xfe") or raw.startswith(b"\xfe\xff"):
+        return raw.decode("utf-16")
+    return raw.decode("utf-8-sig", errors="replace")   # utf-8-sig also drops a UTF-8 byte-order mark
+
+
 def main(path):
-    output = open(path, encoding="utf-8").read()
+    output = read_text(path)
     client = make_client()
     # The output goes in ONCE, as the first user turn. Every question after that rides on the same history,
     # so the model remembers both the output and its own earlier answers.
