@@ -36,12 +36,23 @@ def main(path):
         if not question:
             break
         history.append({"role": "user", "content": question})
-        reply = client.messages.create(model=MODEL, max_tokens=MAX_TOKENS, system=SYSTEM, messages=history)
+        # Fable's safety classifiers can decline an ordinary question. fallbacks="default" tells the API to re-run
+        # a declined request on the model Anthropic recommends for that category, inside the same call.
+        reply = client.beta.messages.create(model=MODEL, max_tokens=MAX_TOKENS, system=SYSTEM, messages=history,
+                                            betas=["server-side-fallback-2026-07-01"], fallbacks="default")
         if reply.stop_reason == "refusal":
-            print("Claude: (declined to answer)")
+            details = getattr(reply, "stop_details", None)
+            why = (" category=" + str(details.category) + " · " + str(details.explanation)) if details else ""
+            print("Claude: (declined to answer, and so did the fallback model." + why + ")")
             history.pop()                                   # keep the history clean for the next question
             continue
         answer = text_of(reply).strip()
+        if not answer:
+            print("Claude: (the reply had no text; stop_reason=" + str(reply.stop_reason) + ")")
+            history.pop()
+            continue
+        if reply.model != MODEL:
+            print("  [answered by " + reply.model + " after " + MODEL + " declined]")
         history.append({"role": "assistant", "content": answer})
         print("\nClaude: " + answer)
         print("  [" + str(reply.usage.input_tokens) + " in, " + str(reply.usage.output_tokens) + " out]")
