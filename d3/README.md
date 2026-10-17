@@ -76,7 +76,7 @@ e9  nine register lines on one trace id: route, authz, tool, resource, retrieve,
 - **E6's rule order** puts aggregate language before the id pattern, so "How many times has KF-2481 been delayed?" counts instead of returning one row (the kit's sabotage lesson, Dock Book II Q35).
 - **E3 gives kavi-agent an escalation scope**, so the denied refund has a legal next move. The audit line is written for denials too.
 - **The model ID** is current: `claude-fable-5-1`, in one place in `common.py`.
-- **`max_tokens` is 2048** and a reply that hits the cap raises a clear error instead of returning empty text.
+- **`max_tokens` is 128,000**, the model's hard ceiling (the API rejects more). Thinking counts toward it, so a cut-off reply is next to impossible; if one happens anyway the code raises a clear error instead of returning empty text. `make_client` sets a 600-second timeout, which the SDK requires before it will send a non-streaming call with a cap this high.
 
 ## Reading order for the exam
 

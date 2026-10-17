@@ -41,7 +41,9 @@ DRY_RUN = os.environ.get("DRY_RUN") == "1"              # battery mode: stand-in
 # ---------------------------------------------------------------
 
 MODEL = "claude-fable-5-1"          # one model for everything: drafting, scoring chunks, token counting
-MAX_TOKENS = 2048                   # the longest reply we accept; thinking tokens count toward it
+MAX_TOKENS = 128000                 # the longest reply we accept: the model's hard ceiling (128K output tokens)
+# The API rejects anything above 128,000 with a 400. Thinking tokens count toward this cap, so a high
+# cap means a cut-off reply is next to impossible. A short answer still costs only what it uses.
 # Fable 5.1 is the latest and most capable model. Thinking is always on, so part of every reply budget
 # goes to thinking. It needs an account on 30-day data retention; a zero-retention org gets a 400.
 
@@ -163,7 +165,9 @@ def make_client():
         from standin import FakeClient
         return FakeClient()
     import anthropic                                  # only imported on the paid path
-    return anthropic.Anthropic(**_sdk_kwargs())
+    # An explicit timeout (seconds) is required: with max_tokens this high the SDK would otherwise refuse a
+    # non-streaming call ("Streaming is strongly recommended"). Ten minutes is far more than any exhibit needs.
+    return anthropic.Anthropic(timeout=600.0, **_sdk_kwargs())
 
 
 def ask_usage(model, question, system=None, max_tokens=MAX_TOKENS):
