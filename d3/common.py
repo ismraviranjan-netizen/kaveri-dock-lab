@@ -180,6 +180,16 @@ def make_client():
     return anthropic.Anthropic(timeout=600.0, **_sdk_kwargs())
 
 
+def create_message(**arguments):
+    """messages.create with Fable's safety net. Fable 5.1 runs safety classifiers that can decline an ordinary
+    request (stop_reason "refusal"). fallbacks="default" asks the API to re-run a declined request on the model
+    Anthropic recommends for that category, inside the same call. On battery the stand-in has no beta surface."""
+    client = make_client()
+    if DRY_RUN:
+        return client.messages.create(**arguments)
+    return client.beta.messages.create(betas=["server-side-fallback-2026-07-01"], fallbacks="default", **arguments)
+
+
 def ask_usage(model, question, system=None, max_tokens=MAX_TOKENS):
     """One call, text in, (text, input_tokens, output_tokens) out. No tools. Checks stop_reason first."""
     arguments = {
@@ -190,7 +200,7 @@ def ask_usage(model, question, system=None, max_tokens=MAX_TOKENS):
     if system is not None:
         arguments["system"] = system
 
-    reply = make_client().messages.create(**arguments)
+    reply = create_message(**arguments)
 
     if reply.stop_reason == "refusal":
         raise RuntimeError("The model declined to answer.")

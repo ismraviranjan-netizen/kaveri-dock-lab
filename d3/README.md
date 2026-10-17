@@ -28,7 +28,7 @@ $env:PRETTY = "1"                             # optional, any OS: indent the JSO
 |---|---|---|
 | `MODEL` | `claude-fable-5-1` | everything: drafting, the E1 and E3 tool loops, E5's live foreman, `count_tokens` (free endpoint, the model only picks the tokenizer) |
 
-One model, one constant, in `common.py`. Fable 5.1 is the latest and most capable model: $10 per million input tokens and $50 per million output tokens, thinking always on (it counts toward `max_tokens`), and it needs an account on 30-day data retention. A whole live run of the nine files is about a dozen calls plus free `count_tokens` calls: a few dollars at most.
+One model, one constant, in `common.py`. Every `ask*()` call goes through `create_message()`, which opts into the API's server-side fallback: if Fable's safety classifier declines an ordinary request, the API re-runs it on the model Anthropic recommends, inside the same call, instead of the exhibit crashing. Fable 5.1 is the latest and most capable model: $10 per million input tokens and $50 per million output tokens, thinking always on (it counts toward `max_tokens`), and it needs an account on 30-day data retention. A whole live run of the nine files is about a dozen calls plus free `count_tokens` calls: a few dollars at most.
 
 ## The files
 
@@ -46,6 +46,7 @@ One model, one constant, in `common.py`. Fable 5.1 is the latest and most capabl
 | `e7_dock_cameras.py` | one ticket writes four JSON lines with one trace id; the draft stage is a real call and its `usage` becomes tokens and paise; then the canned day digested to mean and p95 | 3.4 | 4 |
 | `e8_two_bills.py` | nine full schemas versus nine one-line stubs, measured; then the three bills: monolithic, progressive, small+cached | 3.8 | 5 |
 | `e9_one_ticket.py` | the eight hops on one request, with the gate, the connector, the shelves, the priced window, the carrier timeout and a real draft call, all on one trace id | all | all |
+| `e10_two_lanes.py` | the Part 4 drawing as code: INGEST lane (chunk on headings, ★ situate with one model call, build the vector and BM25 indexes) and QUERY lane (search both, fuse, rerank with one model call, generate from a cached preamble + top-N); the shelves are built plain and situated so you can watch where section 4 ranks for a customer's question | 3.5, 3.6 | 2, 3 |
 | `gen_logday.py` | writes `data/logday.jsonl` for E7 | | |
 | `data/` | `sop_214.md`, `tools_all9.json` (copies of the root files), `logday.jsonl` (generated, git-ignored) | | |
 
@@ -69,6 +70,7 @@ e9  nine register lines on one trace id: route, authz, tool, resource, retrieve,
 - E2 and E8 live use the API's own `count_tokens`, which is free and larger than the four-characters bench. The Dock saw 2,314 / 811 for the belts. Whatever the exact count, the shape is the point.
 - E4 live: the model should list Steps 1 and 2 from the fixed box and say MISSING for 3 to 6. If it fills in the rest from memory, that is exactly the failure to notice: the excerpt did not contain them.
 - E5 live: the foreman is one call that scores the ten section titles 0 to 10, then the fusion is the same code. Expect section 4 at rank 1 for both queries once both halves run.
+- E10 live: five calls in all (situate, then rerank and generate for each of two questions). The 'where section 4 ranks' lines are the lesson: for the customer's wording ('parcel stuck, paperwork problem') the plain shelves rank section 4 low on both indexes, and the situated shelves should lift it, because the model-written sentence in front of the chunk uses the customer's words. The `cache_read` figure on the second question's generate line should be non-zero: the preamble came back from the cache. No battery line is recorded for E10 yet.
 - E7 and E9 live: the draft line carries the real `usage` numbers and a paise figure from the price list in `common.py`. The price list is approximate; edit it.
 - The toy foreman and the canned log day exist only on battery.
 
