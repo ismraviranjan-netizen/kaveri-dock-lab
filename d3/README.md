@@ -15,6 +15,8 @@ python e1_connector.py
 DRY_RUN=1 python e1_connector.py              # Linux / Mac
 set DRY_RUN=1                                 # Windows Command Prompt, then: python e1_connector.py
 $env:DRY_RUN = "1"                            # Windows PowerShell
+
+$env:PRETTY = "1"                             # optional, any OS: indent the JSON log lines of E7 and E9 for reading
 ./run_all.sh     or     run_all.bat           # all nine, on battery
 ```
 

@@ -17,7 +17,7 @@ import json
 import re
 import time
 import uuid
-from common import ask_usage, count_tokens, paise, belt, ALL9, SOP, MODEL, DRY_RUN
+from common import ask_usage, count_tokens, paise, belt, ALL9, SOP, log_line, MODEL, DRY_RUN
 from e1_connector import mcp, Client                      # E1 · the connector (tools, resource, prompt)
 from e3_gate_pass import authorize, audit_log             # E3 · the gate
 from e4_chunking import by_heading                        # E4 · the shelves
@@ -47,7 +47,7 @@ T0 = time.perf_counter()
 def log(**row):
     row = {"trace": TRACE, **row}
     REGISTER.append(row)
-    print("  " + json.dumps(row))
+    log_line(row)
 
 
 def ms_since(start):

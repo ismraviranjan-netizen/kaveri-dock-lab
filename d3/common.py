@@ -34,6 +34,7 @@ for env_file in (Path(__file__).with_name(".env"), Path(__file__).resolve().pare
             os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 DRY_RUN = os.environ.get("DRY_RUN") == "1"              # battery mode: stand-in client, zero paid calls
+PRETTY = os.environ.get("PRETTY") == "1"                # PRETTY=1: indent the JSON log lines for reading on a laptop
 
 
 # ---------------------------------------------------------------
@@ -116,6 +117,15 @@ def fake_escalate(consignment_id, summary, urgency="normal"):
 # ---------------------------------------------------------------
 # STEP F. Helpers every exhibit uses
 # ---------------------------------------------------------------
+
+def log_line(row):
+    """Print one register row. A real log is ONE compact JSON line per event, so a grep or a log tool can
+    read it. PRETTY=1 indents the same row over several lines for human eyes. The data is identical."""
+    if PRETTY:
+        print("  " + json.dumps(row, indent=2).replace("\n", "\n  "))
+    else:
+        print("  " + json.dumps(row))
+
 
 def text_of(reply):
     """Collect the text blocks only. Never read content[0]: a thinking block may come first."""

@@ -12,7 +12,7 @@ import re
 import time
 import uuid
 from collections import defaultdict
-from common import ask_usage, paise, MODEL, SOP, LOGDAY, DRY_RUN
+from common import ask_usage, paise, log_line, MODEL, SOP, LOGDAY, DRY_RUN
 from e4_chunking import by_heading
 from e5_hybrid import bm25ish, title_of
 
@@ -24,7 +24,7 @@ CHUNKS = by_heading(SOP)
 # ---------------------------------------------------------------
 
 def log(**row):
-    print("  " + json.dumps(row))
+    log_line(row)
 
 
 def ms_since(start):
