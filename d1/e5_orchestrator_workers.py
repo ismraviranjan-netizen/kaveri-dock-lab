@@ -8,7 +8,10 @@
 # Run on battery:  DRY_RUN=1 python e5_orchestrator_workers.py      Run live:  python e5_orchestrator_workers.py
 
 import json
+import textwrap
 from common import ask, ask_json, fake_status, fake_carriers, MODEL, BRIEF, DRY_RUN
+
+WIDTH = 100                                            # wrap long model text so the terminal stays readable
 
 
 # ---------------------------------------------------------------
@@ -70,22 +73,58 @@ def synthesise(brief, findings):
 
 
 # ---------------------------------------------------------------
-# STEP 4. The fixed shape: plan, then work in plan order, then synthesise
+# STEP 4. Printing helpers. Nothing here touches the model: they only lay the output out.
+# ---------------------------------------------------------------
+
+def heading(text):
+    print()
+    print("=== " + text + " ===")
+
+
+def block(label, text, indent="    "):
+    """A label on its own line, then the text wrapped underneath it."""
+    print(label)
+    for paragraph in text.strip().split("\n"):
+        print(textwrap.fill(paragraph, WIDTH, initial_indent=indent, subsequent_indent=indent) if paragraph.strip() else "")
+
+
+def show_plan(plan):
+    """The foreman's plan as a table: id, what it waits for, the task."""
+    print("  id  needs   task")
+    for subtask in plan:
+        needs = ",".join(str(n) for n in subtask["needs"]) or "-"
+        first, *rest = textwrap.wrap(subtask["task"], WIDTH - 14) or [""]
+        print("  " + str(subtask["id"]).ljust(4) + needs.ljust(8) + first)
+        for line in rest:
+            print(" " * 14 + line)
+
+
+# ---------------------------------------------------------------
+# STEP 5. The fixed shape: plan, then work in plan order, then synthesise
 # ---------------------------------------------------------------
 
 def orchestrate(brief):
+    heading("FOREMAN · the model writes the plan (1 call)")
     plan = make_plan(brief)
-    print("Foreman's plan:", json.dumps(plan))
+    show_plan(plan)
 
+    heading("WORKERS · one call per subtask, each sees only the findings it asked for")
     findings = {}
     for subtask in plan:                                   # the plan executes in order once written
         result = run_worker(subtask, findings)
         findings[subtask["id"]] = result
-        print("Worker", subtask["id"], "(" + subtask["task"] + ") needs", subtask["needs"], "->", result)
+        print()
+        block("Worker " + str(subtask["id"]) + " · needs " + (str(subtask["needs"]) if subtask["needs"] else "nothing")
+              + " · " + textwrap.shorten(subtask["task"], 70), result)
 
-    return synthesise(brief, findings)
+    heading("SYNTHESIS · sees every finding, writes one recommendation (1 call)")
+    recommendation = synthesise(brief, findings)
+    block("", recommendation, indent="  ")
+    print()
+    print("Calls made: 1 plan + " + str(len(plan)) + " workers + 1 synthesis = " + str(len(plan) + 2))
+    return recommendation
 
 
 if __name__ == "__main__":
     print("# E5 · orchestrator-workers · " + ("DRY_RUN" if DRY_RUN else "LIVE"))
-    print(orchestrate(BRIEF))
+    orchestrate(BRIEF)
