@@ -53,11 +53,13 @@ e3  Nurse said: 'customs' -> ward: customs -> model: claude-fable-5-1 / Customs 
 e4  three scout lines / Parallel 0.2 s vs Sequential 0.6 s / Votes ['APPROVE', 'REJECT', 'APPROVE'] -> Majority APPROVE
 e5  Foreman's plan (ids 1-3) / Worker 1..3 with needs / RECOMMENDATION: file the e-way bill today ...
 e6  Draft 0: 142 words / Round 1 editor said: <criticism> / Round 1 revised: 93 words / Round 2 editor said: PASS
-e7  tool_use (get_shipment_status) / tool_use (find_alternate_carriers) / end_turn / recommendation text
+e7  legend of the six stop_reasons / per turn: blocks that came back, stop_reason, TOOL CALL + TOOL RESULT, case-file size / SUMMARY table / the desk's text
 e8  Initial plan / Run 1 ... / REPLAN: dropped [3] added ['file e-way bill', 'notify Padma of revised ETA'] / Run 2, Run 4, Run 5 / grew=2, budget MAX_NEW=3 not exhausted / RECOMMENDATION
 ```
 
 ## E7 scenarios
+
+E7 narrates itself: a legend of every `stop_reason` value and the branch it lands in, then one block per turn (content blocks, stop_reason, every tool call with its input and result, how the case file grew, tokens, seconds) and a summary table at the end. The loop's logic is the plain bounded loop; the prints are the only addition.
 
 `D1_SCENARIO` steers the stand-in's final reply so each branch of E7 can be watched:
 
