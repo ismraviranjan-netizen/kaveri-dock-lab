@@ -8,7 +8,7 @@
 
 import asyncio
 import time
-from common import ask_async, MODEL_SMALL, MODEL_MAIN, CLAIM_TEXT, DRY_RUN
+from common import ask_async, MODEL, CLAIM_TEXT, DRY_RUN
 
 
 # ---------------------------------------------------------------
@@ -30,7 +30,7 @@ async def check_one_carrier(carrier):
         + " on the Pune-Chennai lane if re-routed via " + carrier + ". "
         "Assume it is currently held at customs. Start your line with the carrier name."
     )
-    return await ask_async(MODEL_SMALL, question)
+    return await ask_async(MODEL, question)
 
 
 async def sectioning():
@@ -59,7 +59,7 @@ async def one_vote():
         "You are a claims reviewer at Kaveri Freight. Read this refund claim and reply with "
         "exactly one word, APPROVE or REJECT. No explanation.\n\n" + CLAIM_TEXT
     )
-    return await ask_async(MODEL_MAIN, question)
+    return await ask_async(MODEL, question)
 
 
 def count_votes(votes):

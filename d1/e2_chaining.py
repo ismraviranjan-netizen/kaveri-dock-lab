@@ -7,7 +7,7 @@
 #
 # Run on battery:  DRY_RUN=1 python e2_chaining.py          Run live:  python e2_chaining.py
 
-from common import ask, MODEL_SMALL, MODEL_MAIN, EMAIL, DRY_RUN
+from common import ask, MODEL, EMAIL, DRY_RUN
 
 
 # ---------------------------------------------------------------
@@ -29,7 +29,7 @@ def classify(email_text):
         "No explanation, no punctuation, just the word.\n\n"
         + email_text
     )
-    word = ask(MODEL_SMALL, question)
+    word = ask(MODEL, question)
     return word.lower()                   # "Customs" and "customs" become the same thing
 
 
@@ -55,7 +55,7 @@ def draft_reply(email_text, category):
         "Do not promise any refund or compensation.\n\n"
         + email_text
     )
-    return ask(MODEL_MAIN, question)
+    return ask(MODEL, question)
 
 
 if __name__ == "__main__":

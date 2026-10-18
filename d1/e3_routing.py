@@ -7,7 +7,7 @@
 #
 # Run on battery:  DRY_RUN=1 python e3_routing.py           Run live:  python e3_routing.py
 
-from common import ask, MODEL_MAIN, MODEL_SMALL, EMAIL, DRY_RUN
+from common import ask, MODEL, EMAIL, DRY_RUN
 from e2_chaining import classify, gate          # reuse E2's nurse and checklist
 
 
@@ -17,11 +17,11 @@ from e2_chaining import classify, gate          # reuse E2's nurse and checklist
 # ---------------------------------------------------------------
 
 SPECIALISTS = {
-    "refund":  (MODEL_MAIN,  "You resolve refund disputes at Kaveri Freight. Acknowledge, say what you will verify, never promise money."),
-    "customs": (MODEL_MAIN,  "You explain customs holds and next steps for Indian import consignments at Kaveri Freight."),
-    "delay":   (MODEL_SMALL, "You write short delay apologies for Kaveri Freight with a new ETA. Under 80 words."),
+    "refund":  (MODEL,  "You resolve refund disputes at Kaveri Freight. Acknowledge, say what you will verify, never promise money."),
+    "customs": (MODEL,  "You explain customs holds and next steps for Indian import consignments at Kaveri Freight."),
+    "delay":   (MODEL, "You write short delay apologies for Kaveri Freight with a new ETA. Under 80 words."),
 }
-# Production would put the refund ward on the Opus tier. MODEL_MAIN is Sonnet here to keep learning runs cheap.
+# Production would put the refund ward on the Opus tier. MODEL is Sonnet here to keep learning runs cheap.
 
 # If the nurse says a word that has no ward (for example "address"), send it here instead of crashing.
 DEFAULT_WARD = "delay"

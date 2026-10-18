@@ -7,12 +7,12 @@
 # Run live:        python e1_augmented_llm.py                (needs ANTHROPIC_API_KEY, see common.py)
 
 import json
-from common import make_client, trace, text_of, fake_status, MODEL_MAIN, MAX_TOKENS, EMAIL, TOOLS_KAVERI, DRY_RUN
+from common import make_client, trace, text_of, fake_status, MODEL, MAX_TOKENS, EMAIL, TOOLS_KAVERI, DRY_RUN
 
 
 # ---------------------------------------------------------------
 # STEP 0. Things we decide before talking to the model
-#         (MODEL_MAIN, MAX_TOKENS and EMAIL come from common.py)
+#         (MODEL, MAX_TOKENS and EMAIL come from common.py)
 # ---------------------------------------------------------------
 
 # The ONE tool the model is allowed to ask for. This is only a description: name, what it does,
@@ -40,7 +40,7 @@ def triage(email_text):
 
     # STEP 4. First call to the model.
     reply = client.messages.create(
-        model=MODEL_MAIN,
+        model=MODEL,
         max_tokens=MAX_TOKENS,
         system=SYSTEM,
         tools=TOOLS,
@@ -77,7 +77,7 @@ def triage(email_text):
 
         # 5e. Second call. Same five arguments. The conversation is now 3 pages long.
         reply = client.messages.create(
-            model=MODEL_MAIN,
+            model=MODEL,
             max_tokens=MAX_TOKENS,
             system=SYSTEM,
             tools=TOOLS,
@@ -95,5 +95,5 @@ if __name__ == "__main__":
     if DRY_RUN:
         print("# E1 · augmented LLM · DRY_RUN: scripted stand-in, 0 paid calls")
     else:
-        print("# E1 · augmented LLM · LIVE · " + MODEL_MAIN)
+        print("# E1 · augmented LLM · LIVE · " + MODEL)
     print(triage(EMAIL))

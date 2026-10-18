@@ -43,11 +43,12 @@ SCENARIO = os.environ.get("D1_SCENARIO", "default")      # steers the stand-in's
 # STEP B. Models and reply length
 # ---------------------------------------------------------------
 
-MODEL_MAIN = "claude-sonnet-5-5"    # judgement, planning, drafting, synthesis
-MODEL_SMALL = "claude-haiku-4-5"    # one-word sorts, small workers, short apologies
-MAX_TOKENS = 2048                   # the longest reply we accept; thinking tokens count toward it
-# Production would put refunds and planning on the Opus tier (claude-opus-5-5).
-# Sonnet is used here so a learning run stays cheap. Change the one constant above to switch.
+MODEL = "claude-fable-5-1"          # one model for everything: judgement, planning, drafting, one-word sorts
+MAX_TOKENS = 128000                 # the longest reply we accept: the model's hard ceiling (128K output tokens)
+# The API rejects anything above 128,000 with a 400. Thinking tokens count toward this cap, so a high
+# cap means a cut-off reply is next to impossible. A short answer still costs only what it uses.
+# Fable 5.1 is the latest and most capable model. Thinking is always on, so part of every reply budget
+# goes to thinking. It needs an account on 30-day data retention; a zero-retention org gets a 400.
 
 
 # ---------------------------------------------------------------
@@ -140,7 +141,23 @@ def make_client():
         from standin import FakeClient
         return FakeClient()
     import anthropic                                  # only imported on the paid path
-    return anthropic.Anthropic(**_sdk_kwargs())
+    # An explicit timeout (seconds) is required: with max_tokens this high the SDK would otherwise refuse a
+    # non-streaming call ("Streaming is strongly recommended"). Ten minutes is far more than any exhibit needs.
+    return anthropic.Anthropic(timeout=600.0, **_sdk_kwargs())
+
+
+FALLBACK = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
+# Fable 5.1 runs safety classifiers that can decline an ordinary request (stop_reason "refusal").
+# fallbacks="default" asks the API to re-run a declined request on the model Anthropic recommends for that
+# category, inside the same call, instead of the exhibit crashing. The stand-in has no beta surface.
+
+
+def create_message(**arguments):
+    """messages.create with Fable's safety net (see FALLBACK above). Every ask*() helper goes through here."""
+    client = make_client()
+    if DRY_RUN:
+        return client.messages.create(**arguments)
+    return client.beta.messages.create(**FALLBACK, **arguments)
 
 
 def ask(model, question, system=None, max_tokens=MAX_TOKENS):
@@ -153,7 +170,7 @@ def ask(model, question, system=None, max_tokens=MAX_TOKENS):
     if system is not None:
         arguments["system"] = system
 
-    reply = make_client().messages.create(**arguments)
+    reply = create_message(**arguments)
 
     if reply.stop_reason == "refusal":
         raise RuntimeError("The model declined to answer.")
@@ -184,11 +201,12 @@ async def ask_async(model, question, max_tokens=MAX_TOKENS):
         return canned_text(None, question)
 
     import anthropic
-    client = anthropic.AsyncAnthropic(**_sdk_kwargs())
-    reply = await client.messages.create(
+    client = anthropic.AsyncAnthropic(timeout=600.0, **_sdk_kwargs())
+    reply = await client.beta.messages.create(
         model=model,
         max_tokens=max_tokens,
         messages=[{"role": "user", "content": question}],
+        **FALLBACK,
     )
     if reply.stop_reason == "refusal":
         raise RuntimeError("The model declined to answer.")

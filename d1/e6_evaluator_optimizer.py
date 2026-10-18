@@ -7,7 +7,7 @@
 #
 # Run on battery:  DRY_RUN=1 python e6_evaluator_optimizer.py      Run live:  python e6_evaluator_optimizer.py
 
-from common import ask, MODEL_MAIN, EMAIL, DRY_RUN
+from common import ask, MODEL, EMAIL, DRY_RUN
 
 
 # ---------------------------------------------------------------
@@ -34,14 +34,16 @@ RUBRIC = (
 def draft_and_polish(email_text):
 
     # 1a. WRITER, first draft. Loose instructions on purpose, so the editor has something to catch.
-    draft = ask(MODEL_MAIN, "Reply to this customer exception email on behalf of Kaveri Freight:\n\n" + email_text)
+    draft = ask(MODEL, "Reply to this customer exception email on behalf of Kaveri Freight:\n\n" + email_text)
     print("Draft 0:", len(draft.split()), "words")
+    if not draft:
+        return "ESCALATED to Meera's desk: the writer returned an empty draft."   # the floor: never ship nothing
 
     # 1b. The editing rounds. range(1, MAX_ROUNDS + 1) is the budget.
     for round_number in range(1, MAX_ROUNDS + 1):
 
         # EDITOR: PASS, or one line of criticism.
-        verdict = ask(MODEL_MAIN, RUBRIC + draft)
+        verdict = ask(MODEL, RUBRIC + draft)
         print("Round", round_number, "editor said:", verdict)
 
         # The exit. PASS means stop early and do not spend the remaining budget.
@@ -49,10 +51,12 @@ def draft_and_polish(email_text):
             break
 
         # WRITER again: revise using the criticism.
-        draft = ask(MODEL_MAIN,
+        draft = ask(MODEL,
                     "Revise the draft below. Apply this criticism exactly and change nothing else:\n"
                     + verdict + "\n\nDraft:\n" + draft)
         print("Round", round_number, "revised:", len(draft.split()), "words")
+        if not draft:
+            return "ESCALATED to Meera's desk: the writer returned an empty revision in round " + str(round_number) + "."
 
     # 1c. Whatever draft we hold now ships: the one that passed, or the best after the budget ran out.
     return draft

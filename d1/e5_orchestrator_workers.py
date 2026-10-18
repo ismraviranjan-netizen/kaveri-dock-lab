@@ -8,7 +8,7 @@
 # Run on battery:  DRY_RUN=1 python e5_orchestrator_workers.py      Run live:  python e5_orchestrator_workers.py
 
 import json
-from common import ask, ask_json, fake_status, fake_carriers, MODEL_MAIN, MODEL_SMALL, BRIEF, DRY_RUN
+from common import ask, ask_json, fake_status, fake_carriers, MODEL, BRIEF, DRY_RUN
 
 
 # ---------------------------------------------------------------
@@ -33,7 +33,7 @@ def make_plan(brief):
         '[{"id": 1, "task": "status check", "needs": []}, {"id": 2, "task": "carrier options", "needs": [1]}]\n'
         '"needs" lists the ids of earlier subtasks whose findings this one depends on.'
     )
-    return ask_json(MODEL_MAIN, question)
+    return ask_json(MODEL, question)
 
 
 # ---------------------------------------------------------------
@@ -53,7 +53,7 @@ def run_worker(subtask, findings_so_far):
         "Known findings from earlier subtasks: " + json.dumps(known) + "\n"
         "Depot facts you may use: " + json.dumps(FACTS)
     )
-    return ask(MODEL_SMALL, question)
+    return ask(MODEL, question)
 
 
 # ---------------------------------------------------------------
@@ -66,7 +66,7 @@ def synthesise(brief, findings):
         "Findings from the workers:\n" + json.dumps(findings, indent=2) + "\n\n"
         "Write ONE recommendation for Meera's desk, three sentences at most, starting with RECOMMENDATION:"
     )
-    return ask(MODEL_MAIN, question)
+    return ask(MODEL, question)
 
 
 # ---------------------------------------------------------------

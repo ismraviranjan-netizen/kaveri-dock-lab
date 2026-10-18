@@ -7,7 +7,7 @@
 # Run on battery:  DRY_RUN=1 python e8_replanning.py       Run live:  python e8_replanning.py
 
 import json
-from common import ask_json, MODEL_MAIN, BRIEF, DRY_RUN
+from common import ask_json, MODEL, BRIEF, DRY_RUN
 from e5_orchestrator_workers import make_plan, run_worker, synthesise     # E5's three moves, reused
 
 
@@ -32,7 +32,7 @@ def check_plan(finding, remaining_tasks):
         "or\n"
         '  {"ok": false, "drop": [ids of tasks that no longer make sense], "add": ["short name of a new task", ...]}'
     )
-    return ask_json(MODEL_MAIN, question)
+    return ask_json(MODEL, question)
 
 
 # ---------------------------------------------------------------

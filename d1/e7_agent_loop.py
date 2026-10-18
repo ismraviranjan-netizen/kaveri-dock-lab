@@ -8,7 +8,7 @@
 # Run live:        python e7_agent_loop.py
 
 import json
-from common import make_client, trace, text_of, fake_status, fake_carriers, MODEL_MAIN, MAX_TOKENS, TOOLS_KAVERI, DRY_RUN, SCENARIO
+from common import make_client, trace, text_of, fake_status, fake_carriers, MODEL, MAX_TOKENS, TOOLS_KAVERI, DRY_RUN, SCENARIO
 
 
 # ---------------------------------------------------------------
@@ -53,7 +53,7 @@ def investigate():
     for turn in range(1, BUDGET + 1):                         # bounded, always
 
         reply = client.messages.create(
-            model=MODEL_MAIN,
+            model=MODEL,
             max_tokens=MAX_TOKENS,
             tools=TOOLS,
             messages=conversation,

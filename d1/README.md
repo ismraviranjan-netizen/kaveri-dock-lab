@@ -23,15 +23,15 @@ set DRY_RUN=1                                 # Windows Command Prompt, then: py
 
 | Constant | Model | Used for |
 |---|---|---|
-| `MODEL_MAIN` | `claude-sonnet-5-5` | judgement, planning, drafting, synthesis, E7's loop |
-| `MODEL_SMALL` | `claude-haiku-4-5` | one-word sorts, small workers, short apologies |
+| `MODEL` | `claude-fable-5-1` | everything: judgement, planning, drafting, synthesis, E7's loop, one-word sorts, small workers |
 
-Production would put refunds and planning on the Opus tier. Sonnet keeps a learning run cheap: the whole series once through costs well under half a dollar. Both constants live in `common.py`.
+One model, one constant, in `common.py`. Fable 5.1 is the latest and most capable model: $10 per million input tokens and $50 per million output tokens, thinking always on (it counts toward `max_tokens`), and it needs an account on 30-day data retention. The whole series once through is a few dollars at most. Every `ask*()` call goes through `create_message()`, which opts into the API's server-side fallback: if Fable's safety classifier declines an ordinary request, the API re-runs it on the model Anthropic recommends, inside the same call, instead of the exhibit crashing.
 
 ## The files
 
 | File | What it is | Pattern | Objective | Law |
 |---|---|---|---|---|
+| `ask_about.py` | not an exhibit: a helper. Run any exhibit into a file, then `python ask_about.py e3_out.txt` and ask questions about that output in a conversation | | | |
 | `common.py` | the shared desk: switches, `.env` loader, models, inputs from `data/`, the two tool schemas, the two tool functions, `text_of`, `trace`, `make_client`, `ask`, `ask_json`, `ask_async` | | | |
 | `standin.py` | the dry-run stand-in. Not needed to learn the patterns | | | |
 | `e1_augmented_llm.py` | one call, one tool, at most one round-trip | augmented LLM | 1.3a | |
@@ -49,7 +49,7 @@ Production would put refunds and planning on the Opus tier. Sonnet keeps a learn
 ```
 e1  # turn 1 stop_reason=tool_use (get_shipment_status) / # turn 2 stop_reason=end_turn / {"category": "customs", "urgency": "high"}
 e2  Desk 1 said: 'customs' / Gate passed / Desk 2 wrote 93 words / Sabotage: Gate stopped the line: bad category: customs-ish
-e3  Nurse said: 'customs' -> ward: customs -> model: claude-sonnet-5-5 / Customs ward reply / 'address' -> 'delay' on claude-haiku-4-5
+e3  Nurse said: 'customs' -> ward: customs -> model: claude-fable-5-1 / Customs ward reply / 'address' -> 'delay' on claude-fable-5-1
 e4  three scout lines / Parallel 0.2 s vs Sequential 0.6 s / Votes ['APPROVE', 'REJECT', 'APPROVE'] -> Majority APPROVE
 e5  Foreman's plan (ids 1-3) / Worker 1..3 with needs / RECOMMENDATION: file the e-way bill today ...
 e6  Draft 0: 142 words / Round 1 editor said: <criticism> / Round 1 revised: 93 words / Round 2 editor said: PASS
@@ -78,12 +78,12 @@ e8  Initial plan / Run 1 ... / REPLAN: dropped [3] added ['file e-way bill', 'no
 ## Where this departs from the book, and why
 
 - **DRY_RUN is a stand-in, not an early return.** The book's exhibits return a canned verdict before any call. Here the dry run swaps the client, so the real control flow runs with zero paid calls. Same trick as the toy foreman in the Domain 3 `e5_hybrid.py`.
-- **Model IDs** are current: `claude-sonnet-5-5` and `claude-haiku-4-5`, in one place in `common.py`.
+- **The model ID** is current: `claude-fable-5-1`, in one place in `common.py`.
 - **No server-side fallbacks**, on purpose, so E7's `refusal` branch does what the book teaches: escalate to a human with a reason.
 - **`text_of()` instead of `content[0].text`**, because current models may put a thinking block first. Assistant turns are replayed whole.
 - **E8's new subtasks are proper task records** with fresh ids and empty `needs`, clipped at the cap. The book's sketch appended bare strings.
 - **E5 and E8 hand the workers depot facts** (`FACTS`), so a live worker reasons over facts the code supplied instead of inventing them.
-- **`max_tokens` is 2048**, because thinking tokens count toward it on current models. A reply that hits the cap raises a clear error instead of returning empty text.
+- **`max_tokens` is 128,000**, the model's hard ceiling (the API rejects more). Thinking counts toward it, so a cut-off reply is next to impossible; if one happens anyway the code raises a clear error instead of returning empty text. `make_client` sets a 600-second timeout, which the SDK requires before it will send a non-streaming call with a cap this high.
 
 ## Reading order for the exam
 
