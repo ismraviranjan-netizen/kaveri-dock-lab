@@ -54,7 +54,7 @@ e4  three scout lines / Parallel 0.2 s vs Sequential 0.6 s / Votes ['APPROVE', '
 e5  Foreman's plan (ids 1-3) / Worker 1..3 with needs / RECOMMENDATION: file the e-way bill today ...
 e6  Draft 0: 142 words / Round 1 editor said: <criticism> / Round 1 revised: 93 words / Round 2 editor said: PASS
 e7  legend of the six stop_reasons / per turn: blocks that came back, stop_reason, TOOL CALL + TOOL RESULT, case-file size / SUMMARY table / the desk's text
-e8  FOREMAN plan table / Run 1.. blocks with the finding and 'foreman: plan still holds' or 'REPLAN · dropped [3] · added [...]' + the remaining plan and a growth meter / LEDGER (planned, ran, dropped, added, checks, calls) / SYNTHESIS
+e8  FOREMAN plan table / 'foreman NOT asked: the worker says the data is unavailable' when a finding is a dead end / Run 1.. blocks with the finding and 'foreman: plan still holds' or 'REPLAN · dropped [3] · added [...]' + the remaining plan and a growth meter / LEDGER (planned, ran, dropped, added, checks, calls) / SYNTHESIS
 ```
 
 ## E7 scenarios

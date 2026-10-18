@@ -3,6 +3,8 @@
 #   Same three moves as E5 (make_plan -> run_worker -> synthesise), plus after EVERY finding the foreman is asked:
 #   "does the remaining plan still make sense?" If not, drop some tasks and add others.
 #   A second budget, MAX_NEW, caps how many tasks the plan may grow by. Law 3 applies to plans, not just turns.
+#   A second guard, UNAVAILABLE: a finding that says "the data is not here" is a dead end, not a reason to replan.
+#   Without it (seen live with MAX_NEW=30) one missing fact spawned a six-task lineage of rephrased fetches.
 #
 #   The output is laid out so the plan can be WATCHED changing: the plan as a table at the start, one block per
 #   run (the task, what it needed, the finding, the foreman's verdict), the remaining plan reprinted after every
@@ -11,6 +13,7 @@
 # Run on battery:  DRY_RUN=1 python e8_replanning.py       Run live:  python e8_replanning.py
 
 import json
+import re
 import textwrap
 from common import ask_json, MODEL, BRIEF, DRY_RUN
 from e5_orchestrator_workers import make_plan, run_worker, synthesise     # E5's three moves, reused
@@ -22,6 +25,21 @@ from e5_orchestrator_workers import heading, block, show_plan              # E5'
 # ---------------------------------------------------------------
 
 MAX_NEW = 3                               # at most 3 tasks may ever be added to the plan
+
+# The second guard, learned from the MAX_NEW=30 run: when a worker reports that the data it needed is simply not
+# there, asking the foreman "does the plan still hold?" only produces another fetch task for the same missing data.
+# A finding that says "unavailable" is terminal. The CODE decides that; the foreman is not asked.
+UNAVAILABLE = re.compile(
+    r"not (?:in|available|recorded|included)|isn't (?:in|confirmed)|aren't in|unavailable"
+    r"|\bno (?:\w+[ /-])*(?:record|data|access)\b|don't have (?:\w+[ /-])*access"
+    r"|\bblocked\b(?::| pending| until)|cannot (?:be )?(?:confirm|pull|retrieve|complete|generate|access|re-attempt)"
+    r"|can't (?:confirm|pull|retrieve|complete|generate|access|send)",
+    re.IGNORECASE)
+
+
+def data_unavailable(finding):
+    """True when the worker's finding says the facts it needed do not exist here. Plain pattern match, no model."""
+    return UNAVAILABLE.search(finding) is not None
 
 
 # ---------------------------------------------------------------
@@ -66,7 +84,8 @@ def ledger(initial, order, dropped, added, grew, checks):
     print("  added on the way  : " + (", ".join(str(t["id"]) + " " + repr(t["task"]) for t in added) if added else "none"))
     print("  growth budget     : " + growth_meter(grew) + ("  EXHAUSTED" if grew >= MAX_NEW else "  not exhausted"))
     print("  plan checks       : " + str(checks["asked"]) + " asked · " + str(checks["ok"]) + " said OK · "
-          + str(checks["replan"]) + " replanned · " + str(checks["blocked"]) + " blocked by the budget")
+          + str(checks["replan"]) + " replanned · " + str(checks["blocked"]) + " blocked by the budget · "
+          + str(checks["skipped"]) + " skipped (data unavailable, nothing to replan on)")
     print("  calls made        : 1 plan + " + str(len(order)) + " workers + " + str(checks["asked"]) + " checks + 1 synthesis = "
           + str(2 + len(order) + checks["asked"]))
 
@@ -85,7 +104,7 @@ def replan(brief):
     grew = 0                                              # how many tasks have been added so far
     next_id = max(task["id"] for task in tasks) + 1       # fresh ids for added tasks
     order, dropped, added = [], [], []                    # for the ledger only
-    checks = {"asked": 0, "ok": 0, "replan": 0, "blocked": 0}
+    checks = {"asked": 0, "ok": 0, "replan": 0, "blocked": 0, "skipped": 0}
 
     heading("WORK · one worker per task, then 'does the rest of the plan still hold?' after EVERY finding")
     run_number = 0
@@ -98,6 +117,13 @@ def replan(brief):
         print()
         block("Run " + str(run_number) + " · task " + str(current["id"]) + " · needs "
               + (str(current["needs"]) if current["needs"] else "nothing") + " · " + textwrap.shorten(current["task"], 70), result)
+
+        if data_unavailable(result):                      # the second guard: a dead end is not a reason to replan
+            checks["skipped"] = checks["skipped"] + 1
+            print("    foreman NOT asked: the worker says the data is unavailable here. Replanning would only add "
+                  "another fetch for the same missing data · " + str(len(tasks)) + " task"
+                  + ("" if len(tasks) == 1 else "s") + " left · " + growth_meter(grew))
+            continue
 
         verdict = check_plan(result, tasks)               # the walk-and-look
         checks["asked"] = checks["asked"] + 1
