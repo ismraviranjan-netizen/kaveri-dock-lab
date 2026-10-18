@@ -21,7 +21,7 @@ SPECIALISTS = {
     "customs": (MODEL,  "You explain customs holds and next steps for Indian import consignments at Kaveri Freight."),
     "delay":   (MODEL, "You write short delay apologies for Kaveri Freight with a new ETA. Under 80 words."),
 }
-# Production would put the refund ward on the Opus tier. MODEL is Sonnet here to keep learning runs cheap.
+# One MODEL for every ward here. Production would give each ward its own tier: refunds on the strongest, apologies on the cheapest.
 
 # If the nurse says a word that has no ward (for example "address"), send it here instead of crashing.
 DEFAULT_WARD = "delay"
