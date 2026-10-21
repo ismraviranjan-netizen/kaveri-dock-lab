@@ -33,6 +33,8 @@ recorded data, exactly as in the book. On Windows, if `₹` fails to print, run
 | `e6_interrogate.py` | 4.4 | four suspects, cheapest convicting test first · reads `friday_fixtures.json` |
 | `e7_levers.py` | 4.5 | route-by-eval arithmetic and the cache minimums · self-contained |
 | `e8_watchman.py` | 4.6 | canary bars, the afternoon's mean vs p95, drift alarms with owners · self-contained |
+| `c1_cache_receipts.py` | 4.5 | prompt caching on `claude-fable-5-1`: the same 8k-token prefix seven times, billed without and with `cache_control`; prints a receipt per call and the saving · `--dry` runs offline |
+| `c2_cache_killers.py` | 4.5 | what silently empties the cache: timestamp, request id, unsorted dict before the breakpoint; the repair; the `max_tokens=0` keep-alive · `--dry` runs offline |
 | `gen_fixtures.py` | — | rebuilds all eight data files deterministically (seed 214); shows how the PDF's numbers are constructed |
 | `check.py` | — | runs every exhibit and diffs it against `expected/eN.txt` — the sabotage lab's scale |
 | `expected/` | — | the printed output of each exhibit, captured from the actual run |
